@@ -1,6 +1,8 @@
 snode_modules/
 
 package-lock.json
+settings.json
+.project
 *.crt
 *.key
 *.DS_Store
