@@ -30,6 +30,12 @@ Template.adminShows.events({
       Meteor.call('removeShow', showId)
     }
   },
+  'click [data-delete-keep-trks-id]'(e, t) {
+    if (confirm('Are You sure want to delete this?')) {
+      var showId = $(e.currentTarget).attr('data-delete-keep-trks-id')
+      Meteor.call('removeShowKeepTracks', showId)
+    }
+  },
   'click [data-duplicate-id]'(e, t) {
     var showId = $(e.currentTarget).attr('data-duplicate-id')
     var showName = prompt('Duplicate Show Name?')
@@ -50,6 +56,17 @@ Template.adminShows.events({
   },
   'click [data-auto-start-show-id]'(e, t) {
     var showId = $(e.currentTarget).attr('data-auto-start-show-id')
-    Meteor.call('addAutoStartShow', showId)
+    Meteor.call('addAutoStartShow', showId, function(error, result){
+  									if(error){
+    									console.log(error.reason);
+										console.log('Error AutoStarting Show')
+										alert('There was an error on enable Auto Start. Auto Start currently disabled.')
+  									}
+									else{
+										if(!result){
+											alert('All tracks must have a track length of at least "00:01" to enable Automation tools!')
+										}
+									}
+								})
   },
 })

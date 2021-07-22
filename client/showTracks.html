@@ -40,6 +40,14 @@
       {{else}}
       <p><i class="fa fa-spin fa-refresh"></i> Uploading files...</p>
       {{/unless}}
+
+	  {{#if $neq numOfTracks 0}}
+	  {{#unless showStarted}}
+      <span class="pull-right">
+	  	<button class="btn btn-warning" data-remove-all-tracks>Remove All Tracks</button>
+      </span>
+	  {{/unless}}
+	  {{/if}}
       <br>
       <section class="content">
 
@@ -76,7 +84,9 @@
                               {{#afModal doc=_id formId="updateTracklistModal" class="btn btn-primary" collection="Tracklists" operation="update" omitFields="isHighlighted,showId,indexNumber"}}
                               Edit
                               {{/afModal}}
-                              <button class="btn btn-warning" data-remove-track="{{_id}}">Remove Track</button>
+							  {{#unless trackPlayed _id}}
+                              <button class="btn btn-warning" id="removetrackbtn" data-remove-track="{{_id}}">Remove Track</button>
+							  {{/unless}}
                             </span>
                             <div class="clearfix"></div>
                             <h4 class="title">

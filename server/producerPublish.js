@@ -4,3 +4,8 @@ Meteor.publish('producerShows', function() {
     $or: [{ userId: this.userId }, { helperUserId: this.userId }],
   })
 })
+
+
+Meteor.publish('allUserTracks', function() {
+	return Tracklists.find({ userId: this.userId })
+})

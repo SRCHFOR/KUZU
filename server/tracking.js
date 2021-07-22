@@ -57,29 +57,76 @@ var currentHash = ''
 Meteor.method(
   'insertTrack',
   function(artist, songTitle, album, label, duration) {
-    var activeShow = Shows.findOne({ isActive: true }) || false
-    if (Shows.findOne({ isArmedForAutoStart: true })) {
-      console.log(App.preshowTracksStarted)
-      if (label.search(/<><>/g) !== -1) {
+	App.autoStartError = false
+	var activeShow = Shows.findOne({ isActive: true }) || false
+	var armedShow = Shows.findOne({ isArmedForAutoStart: true })
+    if (label.search(/<><>/g) !== -1) {
         label = label.replace(/<><>/g, '')
-        if (!App.preshowTracksStarted) {
-          App.preshowTracksStarted = true
-        }
-      } else if (App.preshowTracksStarted) {
-        App.preshowTracksStarted = false
-        Shows.update(
-          { isActive: true },
-          { $set: { isActive: false } },
-          { multi: true }
-        )
-        Shows.update(
-          { isArmedForAutoStart: true },
-          { $set: { isActive: true, isArmedForAutoStart: false } }
-        )
-        Meteor.call('autoplayNextTrack')
+		if (!!activeShow){
+			var activeShowEndSubTen = new moment(new Date(activeShow.showEnd)).subtract(10, 'minutes').valueOf()
+			var currTIme = new Date().getTime()
+			//If current time is greater than 10 mins prior to showEnd of active show, deactivate show and reselect for active show to see if
+			//there's been a newly activated show since prior show deactivation or not.
+			if (currTIme >= activeShowEndSubTen){
+				Shows.update({ _id: activeShow._id }, { $set: { isActive: false, isAutoPlaying: false, autoStartEnd: false } })
+				activeShow = Shows.findOne({ isActive: true }) || false
+			}
+		}
+		App.lastTrkReceivedTime = ''
+		App.lastTrkAcknowledged = false
+    } 
+	else {
+	  if (!App.lastTrkReceivedTime){
+	  	App.lastTrkReceivedTime = new moment(new Date()).valueOf()
+	  }
+	  else{
+		App.lastTrkReceivedTime = 'useShowStart'
+	  }
+
+	  if (!!armedShow) {
+		Shows.update({ _id: armedShow._id },{ $set: { autoPlayPressed: false } })
+		try{
+        	var result = Meteor.call('autoplayNextTrack')
+  			if(!result){
+				console.log('Bad result variable on autoplayNextTrack in tracking.js')
+				console.log(armedShow)
+				App.autoStartError = true
+				let subject = 'There has been an error AutoStarting your show. Manual Start Required.'
+				let message = 'There has been an error AutoStarting your show. Manual Start Required.'
+				App.sendAutoMsgs(armedShow, Accounts.emailTemplates.from, subject, message)
+        		Shows.update(
+          			{ isArmedForAutoStart: true },
+					{ $set: { isArmedForAutoStart: false, autoStartEnd: false, isAutoPlaying: false, autoPlayPressed: false, startPressed: false } }
+        		)
+			}
+			else{
+				App.autoStartError = false
+        		Shows.update(
+          			{ isActive: true },
+          			{ $set: { isActive: false, isAutoPlaying: false, autoStartEnd: false } },
+          			{ multi: true }
+        		)
+        		Shows.update(
+          			{ isArmedForAutoStart: true },
+					//startPressed set after autoplayNextTrack call in autostart so that autoplayNextTrack works correctly but autostart can still simulate actual startPressed functionality later
+          			{ $set: { isActive: true, isArmedForAutoStart: false, startPressed: true } }
+        		)
+			}
+		}
+		catch(error){
+    		console.log(error);
+			console.log('Error on autoplayNextTrack in tracking.js')
+			console.log(armedShow)
+			App.autoStartError = true
+			let subject = 'There has been an error AutoStarting your show. Manual Start Required.'
+			let message = 'There has been an error AutoStarting your show. Manual Start Required.'
+			App.sendAutoMsgs(armedShow, Accounts.emailTemplates.from, subject, message)
+        	Shows.update(
+          		{ isArmedForAutoStart: true },
+				{ $set: { isArmedForAutoStart: false, autoStartEnd: false, isAutoPlaying: false, autoPlayPressed: false, startPressed: false } }
+        	)
+		}
       }
-    } else {
-      App.preshowTracksStarted = false
     }
 
     if (!activeShow || activeShow.hasRadioLogikTracking) {
@@ -92,7 +139,7 @@ Meteor.method(
         playDate: new Date(),
       })
     } else {
-      App.autoDJTrack = {
+	  App.autoDJTrack = {
         artist: artist,
         songTitle: songTitle,
         album: album,

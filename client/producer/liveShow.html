@@ -1,5 +1,6 @@
 <template name='liveShow'>
   {{#if currentUser}}
+  {{chkActiveShowEnd}}
   {{#with currentActiveShow}}
   {{#if currentActiveShow.hasRadioLogikTracking}}
   <div style="background-color:#c0a821;margin-top:-21px;padding:15px 5px;text-align:center;">
@@ -91,7 +92,7 @@
   <!--   Add song track to this show here-->
   <hr>
   <div class="row">
-    <section class="content">
+	<section class="content">
       <div class="col-md-8 col-md-offset-2">
         <div class="panel panel-default">
 
@@ -103,17 +104,21 @@
                   {{#each showTracks}}
                   <tr class="track {{#unless $eq trackType 'song'}}special-track{{/unless}}">
                     <td>
+					  {{#unless currentActiveShow.isAutoPlaying}}
                       {{#if $neq indexNumber 0}}
                       <a href="javascript:;" data-move-up="{{_id}}">
                         <h3><i class="glyphicon glyphicon-chevron-up"></i></h3>
                       </a>
                       {{/if}}
+					  {{/unless}}
                       <h3>{{indexNumber}}</h3>
+					  {{#unless currentActiveShow.isAutoPlaying}}
                       {{#if $neq indexNumber ../getHighestTrackNumber}}
                       <h3><a href="javascript:;" data-move-down="{{_id}}">
                           <i class="glyphicon glyphicon-chevron-down"></i>
                         </a></h3>
                       {{/if}}
+					  {{/unless}}
                     </td>
                     <td>
                       {{#if isHighlighted}}
@@ -140,6 +145,15 @@
                           {{else}}
                           <button class='btn btn-success' data-start-track-id="{{_id}}">Start Track</button>
                           {{/if}}
+						  <!--
+						  {{#if $or currentUser.isAdmin currentUser.producerProfile.isAutomationUIEnabled}}
+						  {{#unless currentActiveShow.isAutoPlaying}}
+						  {{#unless currentActiveShow.chkautoPlayWaiting}}
+						  <button class='btn btn-primary' data-manual-autoplay="{{_id}}">Manual AutoPlay</button>
+						  {{/unless}}
+						  {{/unless}}
+						  {{/if}}
+						  -->
                           <span class="pull-right">{{#afModal doc=_id formId="updateTracklistModal" class="btn btn-primary" collection="Tracklists" operation="update" omitFields="isHighlighted,showId,indexNumber,playDate"}} 
                             Edit
                             {{/afModal}}
@@ -169,7 +183,11 @@
       {{#if isAutoPlaying}}
       <button class="btn btn-lg btn-info" data-pause-autoplay>Pause Autoplay</button>
       {{else}}
+      {{#if chkautoPlayWaiting}}
+      <button class="btn btn-lg btn-info" data-pause-autoplay>Autoplay Waiting</button>
+      {{else}}
       <button class="btn btn-lg btn-success" data-autoplay>Autoplay</button>
+      {{/if}}
       {{/if}}
       {{/if}}
       {{/if}}
@@ -191,10 +209,15 @@
  {{/unless}}-->
       {{#unless $eq recentlyPlayedSongs.count 0}}<button class="btn btn-lg btn-secondary" data-recent-tracks>Recent
         Tracks</button>{{/unless}}
+      <button class="btn btn-lg btn-secondary" data-show-the-time>{{theTime}}</button>
+	{{#if isAutoPlaying}}
+	  <button class="btn btn-lg btn-success" data-stop-auto-add-trk>Add a new track</button>
+	{{else}}
       {{#afModal formId="insertTracklistModal" class="btn btn-lg btn-success" collection="Tracklists"
       operation="insert" omitFields="isHighlighted,showId,indexNumber,playDate"}}
       Add a new track
       {{/afModal}}
+	{{/if}}
     </div>
   </div>
   {{/with}}

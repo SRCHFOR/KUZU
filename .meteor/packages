@@ -21,7 +21,7 @@ kadira:blaze-layout
 aldeed:simple-schema
 twbs:bootstrap
 jquery@1.11.10
-accounts-password@1.5.1
+accounts-password
 aldeed:collection2
 arillo:flow-router-helpers
 dburles:collection-helpers
@@ -62,3 +62,5 @@ percolate:synced-cron
 accounts-ui@1.3.1
 rzymek:fullcalendar
 tmeasday:publish-counts
+email
+awsp:handsontable

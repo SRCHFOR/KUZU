@@ -1,6 +1,8 @@
-var previousTimer
+var timeoutIds = []
 
+//vvv Seemingly Dead Code vvv
 App.startNextTrack = function(track) {
+	console.log('Code doesnt seem reachable')
   var show = Shows.findOne({ isActive: true })
   var nextTrack = Tracklists.findOne(
     { showId: show._id, playDate: { $exists: false } },
@@ -13,11 +15,12 @@ App.startNextTrack = function(track) {
     if (show.autoStartEnd) {
       showOptions.autoStartEnd = false
       showOptions.isActive = false
-      App.fillAutoDJTrack()
+      //???? This is commented out in all other uses and found to not be needed. Verify your use. >>> App.fillAutoDJTrack()
     }
     Shows.update({ isActive: true }, { $set: showOptions })
   }
 }
+//^^^ Seemingly Dead Code ^^^
 
 Meteor.methods({
   startTrack(trackId) {
@@ -37,44 +40,211 @@ Meteor.methods({
       { _id: trackId },
       { $set: { playDate: new Date(), isHighlighted: true } }
     )
-    var show = Shows.findOne({ _id: track.showId })
-    if (track.trackLength && show.isAutoPlaying) {
-      console.log('setting timer')
-      var splitIndex = track.trackLength.indexOf(':')
-      var min = track.trackLength.substr(0, splitIndex) || 0
-      var sec =
-        track.trackLength.substr(splitIndex + 1, track.trackLength.length) || 0
-      var trackLengthMillis = (+min * 60 + +sec) * 1000
-      Meteor.clearTimeout(previousTimer)
-      if (trackLengthMillis > 0) {
-        previousTimer = Meteor.setTimeout(function() {
-          //fold into method up top
-          var nextTrack = Tracklists.findOne({
-            showId: track.showId,
-            indexNumber: track.indexNumber + 1,
-          })
-          if (nextTrack) {
-            Meteor.call('startTrack', nextTrack._id)
-          } else {
-            console.log('there is no next track!')
-            var showOptions = { isAutoPlaying: false }
-            if (show.autoStartEnd) {
-              showOptions.autoStartEnd = false
-              showOptions.isActive = false
-              App.fillAutoDJTrack()
-            }
-            Shows.update({ isActive: true }, { $set: showOptions })
-          }
-        }, trackLengthMillis)
-      }
-    } else {
-      Shows.update({ _id: track.showId }, { $set: { isAutoPlaying: false } })
-    }
   },
-  startNextTrack() {},
+  startNextTrack() {console.log('startNextTrack')},
+  chkautoplayPressed(){
+	var autoPlayPressed = Shows.findOne({isActive: true})
+	if (!!autoPlayPressed){
+		return autoPlayPressed.autoPlayPressed
+	}
+	return false
+  },
+  chkShowTrkReceived(){return App.lastTrkReceivedTime},
+  showTrkAcknowledgment(){
+	if(!App.lastTrkAcknowledged){
+		App.lastTrkAcknowledged = true;
+		Shows.update({isActive: true}, { $set: { showTrkAcknowledged: true }})
+	} 
+	var checkShow = Shows.findOne({isActive: true})
+	if (!!checkShow){
+		return checkShow.showTrkAcknowledged
+	}
+	return false
+  },
   autoplayNextTrack() {
-    Shows.update({ isActive: true }, { $set: { isAutoPlaying: true } })
-    Meteor.call('startNextTrack')
+	var thisShow = Shows.findOne({isActive: true}) || Shows.findOne({isArmedForAutoStart: true})
+	var thisShowId = thisShow._id
+	Shows.update({ _id: thisShowId }, { $set: { isAutoPlaying: true } })
+	
+	if (!thisShow.autoPlayPressed){
+		try{
+			var result = Meteor.call('setAutoTimer', thisShowId, '')
+
+			if (!result && result !== 0){
+				Shows.update({ _id: thisShowId }, { $set: { isAutoPlaying: false } })
+				console.log('autoplayNextTrack found no tracks to autoplay. ShowID: ' + thisShowId)
+				let subject = 'AutoPlay Not Activated; No tracks found to autoplay.'
+				let message = 'No tracks where calculated to play during specified show time.'
+				App.sendAutoMsgs(thisShow, Accounts.emailTemplates.from, subject, message)
+			}
+			else{
+				Meteor.call('startTrack', Tracklists.findOne({showId: thisShowId, indexNumber: result})._id)
+  				Shows.update({ _id: thisShowId }, { $set: { autoPlayPressed: true } })
+				//Meteor.call('startNextTrack')
+			}
+		}
+		catch (error){
+			for (var i = 0; i < timeoutIds.length; i++){
+				Meteor.clearTimeout(timeoutIds[i])
+			}
+			timeoutIds = []
+			Shows.update({ _id: thisShowId }, { $set: { isAutoPlaying: false } })
+			console.log(error);
+    		console.log(error.reason);
+			console.log('Error Setting AutoTimer in autoplayNextTrack')
+		}
+	}
+	
+	var autoPlayPressed = Shows.findOne({ _id: thisShowId })
+	if (!!autoPlayPressed){
+		return autoPlayPressed.autoPlayPressed
+	}
+	return false
+  },
+  manualAutoPlay(trackId) {
+	var thisShow = Shows.findOne({isActive: true})
+	var thisShowId = thisShow._id
+	Shows.update({ _id: thisShowId }, { $set: { isAutoPlaying: true } })
+	
+	try{
+		var result = Meteor.call('setAutoTimer', thisShowId, trackId)
+
+		//result used incase setAutoTimer came back with no track to start on
+		if (!result && result !== 0){
+			Shows.update({ _id: thisShowId }, { $set: { isAutoPlaying: false } })
+			console.log('manualAutoPlay found no tracks to autoplay. ShowID: ' + thisShowId)
+			let subject = 'AutoPlay Not Activated; No tracks found to autoplay.'
+			let message = 'No tracks where calculated to play during specified show time.'
+			App.sendAutoMsgs(thisShow, Accounts.emailTemplates.from, subject, message)
+		}
+		else{
+			Meteor.call('startTrack', trackId)
+			if (!thisShow.autoPlayPressed){
+  				Shows.update({ _id: thisShowId }, { $set: { autoPlayPressed: true } })
+			}
+		}
+	}
+	catch (error){
+		for (var i = 0; i < timeoutIds.length; i++){
+			Meteor.clearTimeout(timeoutIds[i])
+		}
+		timeoutIds = []
+		Shows.update({ _id: thisShowId }, { $set: { isAutoPlaying: false } })
+		console.log(error);
+    	console.log(error.reason);
+		console.log('Error Setting AutoTimer in manualAutoPlay')
+	}
+	
+	var isAutoPlaying = Shows.findOne({ _id: thisShowId })
+	if (!!isAutoPlaying){
+		return isAutoPlaying.isAutoPlaying
+	}
+	return false
+  },
+  setAutoTimer(thisShowId, trackId){
+	//remove previous timers if any
+	for (var i = 0; i < timeoutIds.length; i++){
+		Meteor.clearTimeout(timeoutIds[i])
+	}
+	timeoutIds = []
+	var timeoutIdsNDX = 0
+	var offsetAdjusted = 0
+	var trackLengthMillis = 0
+	var currTime = ''
+	var showStartTime = ''
+	//init whichTrkToStart to '' to indicate first time through loop
+	var whichTrkToStart = ''
+	var showStartTimeOffset = ''
+	var thisShowSnapshot = Shows.findOne({_id: thisShowId})
+	var showTimemin10 = new moment(new Date(thisShowSnapshot.showStart)).subtract(10, 'minutes').valueOf()
+	//check if autoplay cue from show AutoPlay, track Manual Autoplay, or autostart. 
+	//if from cur not from track Manual Autoplay then we need to get lastTrkReceivedTime and calculate showStartTimeOffset
+	if (/*!thisShowSnapshot.isArmedForAutoStart &&*/ !trackId){
+		//if bad lastTrkReceivedTime then use showStart time
+		if ((App.lastTrkReceivedTime == 'useShowStart') || (!App.lastTrkReceivedTime) || (App.lastTrkReceivedTime < showTimemin10)){
+			showStartTime = thisShowSnapshot.showStart.getTime()
+		}
+		else{
+			showStartTime = App.lastTrkReceivedTime
+		}
+		currTime = new moment(new Date()).valueOf()
+	    showStartTimeOffset = +currTime - +showStartTime
+	}
+	
+	if (!!trackId){
+		var trackLists = Tracklists.find(
+          	{ showId: thisShowId,
+			  indexNumber: {$gte: Tracklists.findOne({_id: trackId}).indexNumber}},
+          	{ sort: { indexNumber: 1 } }
+        	).fetch()
+	}
+	else{
+		var trackLists = Tracklists.find(
+          	{ showId: thisShowId },
+          	{ sort: { indexNumber: 1 } }
+        	).fetch()
+	}
+    _.each(trackLists, function(trackList) {
+
+	  //Build out all timers for whole show to run regardless of isAutoPlaying so it can be turned on and off without interruption
+      var splitIndex = trackList.trackLength.indexOf(':')
+      var min = trackList.trackLength.substr(0, splitIndex) || 0
+      var sec =
+        trackList.trackLength.substr(splitIndex + 1, trackList.trackLength.length) || 0
+	  trackLengthMillis = ((+min * 60 + +sec) * 1000) + trackLengthMillis
+
+	  //subtract the lastTrkReceivedTime calculated offset from trackLengthMillis
+	  if (!!trackId/*thisShowSnapshot.isArmedForAutoStart*/){
+	  	offsetAdjusted = trackLengthMillis
+	  }
+	  else{
+		offsetAdjusted = trackLengthMillis - showStartTimeOffset
+	  }
+
+	  if (offsetAdjusted > 0){
+		
+		//if first time through then send back the track NDX to start on
+		if (whichTrkToStart === ''){whichTrkToStart = timeoutIdsNDX}
+		
+        timeoutIds[timeoutIdsNDX] = Meteor.setTimeout(function() {
+          var nextTrack = Tracklists.findOne({
+            showId: trackList.showId,
+            indexNumber: trackList.indexNumber + 1,
+          })
+		  var thisShowSnapshot = Shows.findOne({_id: thisShowId})
+          if (!!thisShowSnapshot && thisShowSnapshot.isActive && thisShowSnapshot.isAutoPlaying && !!nextTrack) {
+			try{
+            	Meteor.call('startTrack', nextTrack._id)
+			}
+			catch(error){
+				console.log(error);
+				console.log(error.reason);
+				console.log('Error on startTrack in setAutoTimer track timeout. Track._id: "'+nextTrack._id+'"')
+				let subject = 'Error during AutoPlay. Track "'+nextTrack.songTitle+'" not started during AutoPlay. AutoPlay will continue.'
+				let message = 'Track "'+nextTrack.songTitle+'" not started during AutoPlay. AutoPlay will continue.'
+				App.sendAutoMsgs(thisShowSnapshot, Accounts.emailTemplates.from, subject, message)
+			}
+          } 
+		  else {
+		  	var showOptions = {isAutoPlaying: false, autoStartEnd: false}
+			if(!!nextTrack){
+          		Shows.update({ _id: thisShowSnapshot._id }, { $set: showOptions })
+            }
+			else{
+            	console.log('there is no next track!')
+				//Deactivate show if autoplay is enabled
+				if (!!thisShowSnapshot && thisShowSnapshot.isActive && thisShowSnapshot.isAutoPlaying){
+              		showOptions.isActive = false
+				}
+          		Shows.update({ _id: thisShowSnapshot._id }, { $set: showOptions })
+              	//App.fillAutoDJTrack()
+            }
+          }
+        }, offsetAdjusted)
+	  }
+	  timeoutIdsNDX++
+	})
+	return whichTrkToStart
   },
   pauseAutoplay() {
     Shows.update({ isActive: true }, { $set: { isAutoPlaying: false } })

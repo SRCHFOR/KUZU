@@ -1,3 +1,4 @@
+import momenttz from 'moment-timezone'
 Meteor.methods({
   download: function(dateFrom = false, dateTo = false) {
     var collection = ''
@@ -24,17 +25,18 @@ Meteor.methods({
     var delimiter = '\t'
     return exportcsv.exportToCSV(collection, heading, delimiter)
   },
-  duplicateShow(showId, showName) {
-    var show = Shows.findOne({ _id: showId })
+  duplicateShow(showId, showObject) {
+	var show = Shows.findOne({ _id: showId })
     Shows.insert(
       {
-        showName: showName,
+        showName: showObject.showName,
         defaultMeta: show.defaultMeta,
         isShowingDefaultMeta: show.isShowingDefaultMeta,
         description: show.description,
         isShowingDescription: show.isShowingDescription,
       },
       function(err, docInserted) {
+		if (!showObject.copyTracks){return}
         var trackLists = Tracklists.find(
           { showId: show._id },
           { sort: { indexNumber: 1 } }
@@ -58,6 +60,12 @@ Meteor.methods({
   getRadioLogikStatus() {
     return App.isRadioLogicDown
   },
+  checkForAutoStartError(){
+	return App.autoStartError
+  },
+  acknowledgeAutoError(){
+	App.autoStartError = false
+  },
   changePrivledge(userId, userRole, action) {
     var obj = {}
     obj[userRole] = !!action
@@ -69,15 +77,38 @@ Meteor.methods({
       { $set: { name: name, image: image, bio: bio, isProducer: true } }
     )
   },
+  updateisProducer: function(userId) {
+    Meteor.users.update(
+      { _id: userId },
+      { $set: { isProducer: true } }
+    )
+
+	var user = Meteor.users.findOne({ _id: userId })
+	//var to = 'kuzu929fm@gmail.com'
+	var to = 'mlensing47@gmail.com'
+	var from = Accounts.emailTemplates.from
+	var subject = 'New User "' + user.emails[0].address + '" has registered and verified email.'
+	var message = 'New User "' + user.emails[0].address + '" has registered and verified email.'
+	Email.send({ to, from, subject, message })
+  },
   editTrack(modifier, _id) {
     Tracklists.update({ _id: _id }, modifier)
   },
   removeTrack(trackId) {
     Tracklists.remove(trackId)
   },
+  removeAllTracks(showId) {
+    var trackLists = Tracklists.find(
+          { showId: showId },
+          { sort: { indexNumber: 1 } }
+        ).fetch()
+    _.each(trackLists, function(trackList) {
+          Tracklists.remove(trackList._id)
+        })
+  },
   deactivateShow(showId) {
-    Shows.update({ _id: showId }, { $set: { isActive: false } })
-    App.fillAutoDJTrack()
+    Shows.update({ _id: showId }, { $set: { isActive: false, isAutoPlaying: false, autoStartEnd: false } })
+    //App.fillAutoDJTrack()
   },
   incrementPosition(trackId) {
     var track = Tracklists.findOne({ _id: trackId })
@@ -111,7 +142,7 @@ Meteor.methods({
   activateShow(showId) {
     Shows.update(
       { isActive: true },
-      { $set: { isActive: false } },
+      { $set: { isActive: false, isAutoPlaying: false, autoStartEnd: false } },
       { multi: true }
     )
     Shows.update(
@@ -121,12 +152,23 @@ Meteor.methods({
           isActive: true,
           isShowingDefaultMeta: true,
           isArmedForAutoStart: false,
+		  startPressed: true,
         },
       }
     )
   },
   removeShow(showId) {
+	var trackLists = Tracklists.find(
+          { showId: showId },
+          { sort: { indexNumber: 1 } }
+        ).fetch()
+    _.each(trackLists, function(trackList) {
+          Tracklists.remove(trackList._id)
+        })
     Shows.remove(showId)
+  },
+  removeShowKeepTracks(showId) {
+	Shows.remove(showId)
   },
   deleteFeature(featureId) {
     FeatureRequests.remove({ _id: featureId })
@@ -137,7 +179,7 @@ Meteor.methods({
     var showDescription = ' '
     var defaultMeta = 'Kuzu Show'
     var hasMessagingEnabled = false
-    if (user.producerProfile) {
+	if (user.producerProfile) {
       showName = user.producerProfile.showName || 'Kuzu Show'
       showDescription = user.producerProfile.description || ''
       defaultMeta = user.producerProfile.defaultMeta || 'Kuzu Show'
@@ -154,6 +196,14 @@ Meteor.methods({
   clearPlaytime(trackId) {
     Tracklists.update({ _id: trackId }, { $unset: { playDate: '' } })
   },
+  serverTime(){
+	var centralTime = momenttz(new Date()).tz('America/Chicago')
+	return centralTime.format('l') + ', ' + centralTime.format('LTS')
+  },
+  getAllUserShows(){
+	var users = Meteor.users.find().fetch()
+	return users
+  }
 })
 
 Meteor.method('removeUser', function(userId) {

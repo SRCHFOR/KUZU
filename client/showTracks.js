@@ -10,6 +10,16 @@ Template.showTracks.helpers({
   uploading() {
     return Template.instance().uploading.get()
   },
+  numOfTracks(){
+	return Tracklists.find({ showId: FlowRouter.getParam('showId') }).count()
+  },
+  showStarted(){
+	return Shows.findOne({userId: Meteor.userId(),_id: FlowRouter.getParam('showId'),}).startPressed
+  },
+  trackPlayed(trackId){
+	var playDate = Tracklists.findOne({ _id: trackId }).playDate
+	return playDate
+  },
   showMain() {
     if (Meteor.user() && Meteor.user().isAdmin) {
       return Shows.findOne({ _id: FlowRouter.getParam('showId') })
@@ -72,5 +82,10 @@ Template.showTracks.events({
         )
       },
     })
+  },
+  'click [data-remove-all-tracks]'(event, template) {
+	if (confirm('Are you sure you want to Remove All Tracks?')){
+    	Meteor.call('removeAllTracks', FlowRouter.getParam('showId'))
+	}
   },
 })

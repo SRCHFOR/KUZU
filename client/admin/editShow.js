@@ -6,8 +6,28 @@ Template.editShow.onCreated(function() {
   })
 })
 
+Template.editShow.events({
+  'click [data-submit-show-edit]'(){
+	var showStart = AutoForm.getFieldValue("showStart", "editShowForm")
+	var showEnd = AutoForm.getFieldValue("showEnd", "editShowForm")
+	if (!!showStart && !!showEnd){
+		var timeshowStart = new Date(showStart).getTime()
+		var timeshowEnd = new Date(showEnd).getTime()
+    	if(timeshowEnd <= timeshowStart){
+			alert('Show End must be greater than Show Start')
+		}
+		else{
+			window.history.back()
+		}
+	}
+	else{
+		window.history.back()
+	}
+  },
+})
+
 Template.editShow.helpers({
-  show() {
+  showUserCheck() {
     if (Meteor.user() && Meteor.user().isAdmin) {
       return Shows.findOne({ _id: FlowRouter.getParam('showId') })
     } else {
@@ -19,6 +39,8 @@ Template.editShow.helpers({
   },
 })
 
+/*
+Disabled hook because submit event is controlling window back
 AutoForm.hooks({
   editShowForm: {
     onSuccess() {
@@ -26,3 +48,4 @@ AutoForm.hooks({
     },
   },
 })
+*/

@@ -16,7 +16,7 @@ Meteor.method(
       // Let's say we want this function to accept a form-encoded request with
       // fields named `a` and `b`.
       var content = request.body
-      console.log(content)
+      //console.log(content)
       return [content.messageBody, content.sentBy]
     },
   }
@@ -43,7 +43,7 @@ Meteor.publish('new-messages-count-user', function() {
 })
 
 Meteor.publish('new-messages-count-show', function() {
-  var show = Shows.findOne({ isActive: true })
+  var show = Shows.findOne({ isActive: true }) || Shows.findOne({ isArmedForAutoStart: true })
   if (!show) {
     return this.ready()
   }
@@ -56,7 +56,7 @@ Meteor.publish('new-messages-count-show', function() {
 
 Meteor.methods({
   markShowMessagesRead() {
-    var show = Shows.findOne({ isActive: true })
+    var show = Shows.findOne({ isActive: true }) || Shows.findOne({ isArmedForAutoStart: true })
     if (show) {
       Messages.update(
         { showId: show._id },

@@ -10,7 +10,7 @@ AutoForm.hooks({
       FlowRouter.go('showStatus')
     },
     onSubmit: function(insertDoc, updateDoc, currentDoc) {
-      Shows.update({ userId: Meteor.userId }, { $set: { isActive: false } })
+      Shows.update({ userId: Meteor.userId }, { $set: { isActive: false, isAutoPlaying: false, autoStartEnd: false } })
     },
   },
 })

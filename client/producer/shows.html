@@ -1,5 +1,40 @@
 <template name="producerShows">
-  <h2>My Shows <button class="btn btn-primary" data-create-show>Create New Show</button></h2>
+  <h2>My Shows <button class="btn btn-primary" data-create-show>Create New Show</button>
+		<span class="pull-right">
+	  		<button class="btn btn-primary" data-gimme-show-stats>Show Stats</button>
+      	</span>
+  </h2>
+  <div class="modal fade" id="duplicateShowModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button id="copyTracksBtnX" type="button" class="close" aria-hidden="true" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Duplicate Show Name?</h4>
+        </div>
+        <div class="modal-body">
+          <input type="text" id="showName" name="showName" size="50"><br><br>
+		  <label for="copyTracksYes">Copy Tracks?</label>&nbsp;&nbsp;&nbsp;&nbsp;
+		  <input type="checkbox" id="copyTracks"><br><br>
+		  <button id="copyTracksBtnYes" type="submit" class="btn btn-primary">OK</button>
+		  <button id="copyTracksBtnCan" type="button" class="btn btn-default cancel" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="alertmodal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button id="alertBtnX" type="button" class="close" aria-hidden="true" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Alert</h4>
+        </div>
+        <div class="modal-body">
+          <p id="alerttxt"></p><br><br>
+		  <button id="alertBtnCan" type="button" class="btn btn-default cancel" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <hr>
   {{#each showsWithoutDates}}
   <div>
@@ -8,9 +43,12 @@
           show without start and end times.</small></a></h3>
     <h3><a href="{{pathFor 'showTracks' showId=_id}}">
         <!--{{numTracks}} -->Tracks</a> {{#if defaultMeta}}<small>{{defaultMeta}}</small>{{/if}}</h3>
+	{{showDuplicateModal}}
     <button class="btn btn-success" data-duplicate-id="{{_id}}">Duplicate</button>
+	{{#unless checkStartPressed _id}}
     <button class="btn btn-info" data-edit-show-id="{{_id}}">Edit</button>
     <button class="btn btn-danger" data-delete-id="{{_id}}">Delete</button>
+    {{/unless}}
     {{else}}
     {{> editShowInline}}
     {{/unless}}
@@ -31,11 +69,15 @@
     <h3>{{#unless isActive}}<a href="{{pathFor 'showTracks' showId=_id}}">
         <!--{{numTracks}} -->Tracks</a>{{/unless}} {{#if defaultMeta}}<small>{{defaultMeta}}</small>{{/if}}</h3>
     {{#unless autoStartEnd}}
+	{{cancelAutoStartErrorChkInt}}
     {{#if isActive}}
-    <button class="btn btn-warning" data-deactivate-show-id="{{_id}}">Stop Show</button>{{else}}
-    {{#if startTimeAfterCurrentDate}}
+    <button class="btn btn-warning" data-deactivate-show-id="{{_id}}">Stop Show</button>
+    {{else}}
+    <!--{{#if startTimeAfterCurrentDate}}-->{{#unless checkStartPressed _id}}
+	{{#if isTenMinutesPriorToShowTime _id}}
     <button class="btn btn-primary" data-activate-show-id="{{_id}}">Start Show</button>
-    {{/if}}
+	{{/if}}
+    <!--{{/if}}-->{{/unless}}
     {{/if}}
     {{#if currentUser.producerProfile.isAutomationUIEnabled}}
     {{#if endTimeAfterCurrentDate}}
@@ -45,13 +87,22 @@
     {{else}}
     {{#if currentUser.producerProfile.isAutomationUIEnabled}}
     {{#if endTimeAfterCurrentDate}}
+	{{warnBadAutoStart}}
+	{{chkArmedShow}}
     <button class="btn btn-success" data-stop-auto-start-show-id="{{_id}}">Auto Start and End is On</button>
     {{/if}}
     {{/if}}
     {{/unless}}
+	{{showDuplicateModal}}
     <button class="btn btn-success" data-duplicate-id="{{_id}}">Duplicate</button>
+    {{#if isActive}}
     <button class="btn btn-info" data-edit-show-id="{{_id}}">Edit</button>
-    {{#unless isActive}}
+    {{else}}
+	{{#unless checkStartPressed _id}}
+    <button class="btn btn-info" data-edit-show-id="{{_id}}">Edit</button>
+    {{/unless}}
+    {{/if}}
+	{{#unless checkStartPressed _id}}
     <button class="btn btn-danger" data-delete-id="{{_id}}">Delete</button>
     {{/unless}}
     {{else}}
