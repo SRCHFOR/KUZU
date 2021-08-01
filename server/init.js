@@ -1,6 +1,9 @@
 process.env.MAIL_URL="smtps://mattlensing@gmail.com:"+Meteor.settings.gmailAppWord+"@smtp.gmail.com:465/";
+//process.env.MAIL_URL="smtps://kuzu929fm@gmail.com:"+Meteor.settings.gmailAppWord+"@smtp.gmail.com:465/";
+process.env.ROOT_URL="http://localhost:3000/"
+//process.env.ROOT_URL="http://producer.kuzu.fm/"
 Accounts.emailTemplates.siteName = "KUZU Producer Verification";
-Accounts.emailTemplates.from = "KUZU Accounts <KUZUalerts@gmail.com>";
+Accounts.emailTemplates.from = "KUZU Accounts <KUZU929FM@GMAIL.COM>";
 Accounts.emailTemplates.verifyEmail = {
 	subject() {
 		return "Activate your account now!";
@@ -12,6 +15,9 @@ Accounts.emailTemplates.verifyEmail = {
 console.log(process.env.NODE_ENV)
 
 Meteor.startup(function(){
+	Meteor.absoluteUrl.defaultOptions.secure = false
+	Meteor.absoluteUrl.defaultOptions.rootUrl = process.env.ROOT_URL	
+	
 	Meteor.setInterval(function() {
 		Shows.find({ showStart: { $exists: true, $gte : new Date((new Date().toISOString())) } }).forEach(function(show){
 														Meteor.users.find({"producerProfile.showStartReminderSubs": {$elemMatch: {$eq: show.userId}}}).forEach(function(subscriber){
