@@ -79,9 +79,12 @@ Template.liveShow.helpers({
     return Tracklists.find({ isHighlighted: true })
   },
   goBack() {
-    //window.history.back()
 	Meteor.clearInterval(clockInterval)
+    //window.history.back()
     FlowRouter.go('producerShows')
+	//Client must be refreshed when a show is deactivated
+	//Not sure if goBack is called when show deactivated but refreshing in case
+	location.reload()
   },
   messages() {
     var show = Shows.findOne({ isActive: true })
@@ -143,7 +146,10 @@ Template.liveShow.helpers({
 	if (checkActiveShow.get()){
 		if (!!Shows.findOne({ _id: activeShowId, isActive: false })){
 	  		Meteor.clearInterval(clockInterval)
-			FlowRouter.go('producerShows')
+    		//window.history.back()
+    		FlowRouter.go('producerShows')
+			//Client must be refreshed when a show is deactivated
+			location.reload()
 		}
 		else{
 			activeShowId = Shows.findOne({ isActive: true })._id
@@ -152,7 +158,10 @@ Template.liveShow.helpers({
 	else {
 		if (!!Shows.findOne({ _id: activeShowId, isActive: false })){
 	  		Meteor.clearInterval(clockInterval)
+    		//window.history.back()
     		FlowRouter.go('producerShows')
+			//Client must be refreshed when a show is deactivated
+			location.reload()
 		}
 	}
   },
@@ -166,9 +175,11 @@ Template.liveShow.events({
   'click [data-stop-show]'() {
 	if (confirm('Are You sure want to stop this show?')) {
       Meteor.call('deactivateShow', Shows.findOne({ isActive: true })._id)
-      //window.history.back()
 	  Meteor.clearInterval(clockInterval)
-	  FlowRouter.go('producerShows')
+      //window.history.back()
+      FlowRouter.go('producerShows')
+	  //Client must be refreshed when a show is deactivated
+	  location.reload()
     }
   },
   'click [data-recent-tracks]'(e, t) {
@@ -201,36 +212,46 @@ Template.liveShow.events({
   },
   'click [data-start-track-id]'(e, t) {
 	var activeShowAutoPlay = Shows.findOne({ isActive: true }).isAutoPlaying
+    var trackId = $(e.currentTarget).attr('data-start-track-id')
+	var trackRec = Tracklists.findOne({ _id: trackId})
 	if (activeShowAutoPlay || autoPlayWaiting.get()){
 		//alert('AutoPlay must be paused to use manual controls')
-		if(confirm("Are you sure you want to start autoplay from this track?")){
-			Meteor.clearInterval(showStartInterval)
-			Meteor.clearTimeout(showStartTimeout)
-			autoPlayWaiting.set(false)
-    		var trackId = $(e.currentTarget).attr('data-start-track-id')
-    		Meteor.call('manualAutoPlay', trackId)
+		if (!trackRec.trackLength || trackRec.trackLength == '00:00' || !(/^\d\d\:\d\d$/.test(trackRec.trackLength))){
+			  alert('All tracks must have a track length of at least "00:01" to enable Automation tools!')
+		}
+		else{
+			if(confirm("Are you sure you want to start autoplay from this track?")){
+				Meteor.clearInterval(showStartInterval)
+				Meteor.clearTimeout(showStartTimeout)
+				autoPlayWaiting.set(false)
+    			Meteor.call('manualAutoPlay', trackId)
+			}
 		}
 	}
 	else{
-    	var trackId = $(e.currentTarget).attr('data-start-track-id')
     	//window.scroll(0, 0);
     	Meteor.call('startTrack', trackId)
 	}
   },
   'click [data-restart-track-id]'(e, t) {
 	var activeShowAutoPlay = Shows.findOne({ isActive: true }).isAutoPlaying
+	var trackId = $(e.currentTarget).attr('data-restart-track-id')
+	var trackRec = Tracklists.findOne({ _id: trackId})
 	if (activeShowAutoPlay || autoPlayWaiting.get()){
 		//alert('AutoPlay must be paused to use manual controls')
-		if(confirm("Are you sure you want to restart autoplay from this track?")){
-			Meteor.clearInterval(showStartInterval)
-			Meteor.clearTimeout(showStartTimeout)
-			autoPlayWaiting.set(false)
-    		var trackId = $(e.currentTarget).attr('data-restart-track-id')
-    		Meteor.call('manualAutoPlay', trackId)
+		if (!trackRec.trackLength || trackRec.trackLength == '00:00' || !(/^\d\d\:\d\d$/.test(trackRec.trackLength))){
+			  alert('All tracks must have a track length of at least "00:01" to enable Automation tools!')
+		}
+		else{
+			if(confirm("Are you sure you want to restart autoplay from this track?")){
+				Meteor.clearInterval(showStartInterval)
+				Meteor.clearTimeout(showStartTimeout)
+				autoPlayWaiting.set(false)
+    			Meteor.call('manualAutoPlay', trackId)
+			}
 		}
 	}
 	else{
-    	var trackId = $(e.currentTarget).attr('data-restart-track-id')
     	//window.scroll(0, 0);
     	result = window.confirm('Are you sure you want to restart the track?')
     	if (result) {

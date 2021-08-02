@@ -144,6 +144,8 @@ Template.producerShows.events({
   'click [data-deactivate-show-id]'(e, t) {
     var showId = $(e.currentTarget).attr('data-deactivate-show-id')
     Meteor.call('deactivateShow', showId)
+	//Client must be refreshed when a show is deactivated
+	location.reload()
   },
   'click [data-activate-show-id]'(e, t) {
     var showId = $(e.currentTarget).attr('data-activate-show-id')

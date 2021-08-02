@@ -92,6 +92,9 @@ Meteor.methods({
 			console.log(error);
     		console.log(error.reason);
 			console.log('Error Setting AutoTimer in autoplayNextTrack')
+			let subject = 'AutoPlay Failure; Error setting autotimer in autoplayNextTrack.'
+			let message = 'AutoPlay Failure; Error setting autotimer in autoplayNextTrack.'
+			App.sendAutoMsgs(thisShow, Accounts.emailTemplates.from, subject, message)
 		}
 	}
 	
@@ -133,6 +136,9 @@ Meteor.methods({
 		console.log(error);
     	console.log(error.reason);
 		console.log('Error Setting AutoTimer in manualAutoPlay')
+		let subject = 'AutoPlay Failure; Error setting autotimer in manualAutoPlay.'
+		let message = 'AutoPlay Failure; Error setting autotimer in manualAutoPlay.'
+		App.sendAutoMsgs(thisShow, Accounts.emailTemplates.from, subject, message)
 	}
 	
 	var isAutoPlaying = Shows.findOne({ _id: thisShowId })
