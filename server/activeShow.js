@@ -217,7 +217,8 @@ Meteor.methods({
             showId: trackList.showId,
             indexNumber: trackList.indexNumber + 1,
           })
-		  //var thisShowSnapshot = Shows.findOne({_id: thisShowId})
+		  //Get snapshot again before working on show data as it may have changed
+		  var thisShowSnapshot = Shows.findOne({_id: thisShowId})
           if (!!thisShowSnapshot && thisShowSnapshot.isActive && thisShowSnapshot.isAutoPlaying && !!nextTrack) {
 			try{
             	Meteor.call('startTrack', nextTrack._id)
@@ -234,7 +235,12 @@ Meteor.methods({
 		  else {
 		  	var showOptions = {isAutoPlaying: false, autoStartEnd: false}
 			if(!!nextTrack){
-          		Shows.update({ _id: thisShowSnapshot._id }, { $set: showOptions })
+				try{
+          			Shows.update({ _id: thisShowSnapshot._id }, { $set: showOptions })
+				}
+				catch(error){
+					console.log('thisShowSnapshot is undefined in activeShow line 239')
+				}
             }
 			else{
             	console.log('there is no next track!')
@@ -242,7 +248,12 @@ Meteor.methods({
 				if (!!thisShowSnapshot && thisShowSnapshot.isActive && thisShowSnapshot.isAutoPlaying){
               		showOptions.isActive = false
 				}
-          		Shows.update({ _id: thisShowSnapshot._id }, { $set: showOptions })
+          		try{
+          			Shows.update({ _id: thisShowSnapshot._id }, { $set: showOptions })
+				}
+				catch(error){
+					console.log('thisShowSnapshot is undefined in activeShow line 252')
+				}
               	//App.fillAutoDJTrack()
             }
           }
