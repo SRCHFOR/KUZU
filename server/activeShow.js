@@ -217,7 +217,7 @@ Meteor.methods({
             showId: trackList.showId,
             indexNumber: trackList.indexNumber + 1,
           })
-		  var thisShowSnapshot = Shows.findOne({_id: thisShowId})
+		  //var thisShowSnapshot = Shows.findOne({_id: thisShowId})
           if (!!thisShowSnapshot && thisShowSnapshot.isActive && thisShowSnapshot.isAutoPlaying && !!nextTrack) {
 			try{
             	Meteor.call('startTrack', nextTrack._id)
