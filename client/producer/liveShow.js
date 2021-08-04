@@ -173,7 +173,7 @@ Template.liveShow.events({
     Meteor.call('removeMessage', messageId)
   },
   'click [data-stop-show]'() {
-	if (confirm('Are You sure want to stop this show?')) {
+	if (confirm('Are you sure you want to stop this show?')) {
       Meteor.call('deactivateShow', Shows.findOne({ isActive: true })._id)
 	  Meteor.clearInterval(clockInterval)
       //window.history.back()
@@ -316,7 +316,7 @@ Template.liveShow.events({
 				
 		    	//Meteor.call("startNextTrack");
 		
-				alert('Autoplay will start immediatly after show cued from station.')
+				alert('Autoplay will start immediately after show cued from station.')
 						
 				autoPlayWaiting.set(true)
 					
