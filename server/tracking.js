@@ -84,7 +84,9 @@ Meteor.method(
 	  }
 
 	  if (!!armedShow) {
-		Shows.update({ _id: armedShow._id },{ $set: { autoPlayPressed: false } })
+		//Set some fields for proper workage
+		App.lastTrkAcknowledged = true;
+		Shows.update({ _id: armedShow._id },{ $set: { autoPlayPressed: false, showTrkAcknowledged: true } })
 		try{
         	var result = Meteor.call('autoplayNextTrack')
   			if(!result){
