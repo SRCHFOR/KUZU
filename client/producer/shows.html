@@ -45,8 +45,8 @@
         <!--{{numTracks}} -->Tracks</a> {{#if defaultMeta}}<small>{{defaultMeta}}</small>{{/if}}</h3>
 	{{showDuplicateModal}}
     <button class="btn btn-success" data-duplicate-id="{{_id}}">Duplicate</button>
-	{{#unless checkStartPressed _id}}
     <button class="btn btn-info" data-edit-show-id="{{_id}}">Edit</button>
+	{{#unless checkStartPressed _id}}
     <button class="btn btn-danger" data-delete-id="{{_id}}">Delete</button>
     {{/unless}}
     {{else}}
@@ -95,13 +95,14 @@
     {{/unless}}
 	{{showDuplicateModal}}
     <button class="btn btn-success" data-duplicate-id="{{_id}}">Duplicate</button>
-    {{#if isActive}}
+    <button class="btn btn-info" data-edit-show-id="{{_id}}">Edit</button>
+    <!--{{#if isActive}}
     <button class="btn btn-info" data-edit-show-id="{{_id}}">Edit</button>
     {{else}}
 	{{#unless checkStartPressed _id}}
     <button class="btn btn-info" data-edit-show-id="{{_id}}">Edit</button>
     {{/unless}}
-    {{/if}}
+    {{/if}}-->
 	{{#unless checkStartPressed _id}}
     <button class="btn btn-danger" data-delete-id="{{_id}}">Delete</button>
     {{/unless}}
