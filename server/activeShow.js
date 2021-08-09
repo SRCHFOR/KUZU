@@ -164,7 +164,7 @@ Meteor.methods({
 	var thisShowSnapshot = Shows.findOne({_id: thisShowId})
 	var showTimemin10 = new moment(new Date(thisShowSnapshot.showStart)).subtract(10, 'minutes').valueOf()
 	//check if autoplay cue from show AutoPlay, track Manual Autoplay, or autostart. 
-	//if from cur not from track Manual Autoplay then we need to get lastTrkReceivedTime and calculate showStartTimeOffset
+	//if not from Manual Autoplay (only manual sends trackId) then we need to get lastTrkReceivedTime and calculate showStartTimeOffset
 	if (/*!thisShowSnapshot.isArmedForAutoStart &&*/ !trackId){
 		//if bad lastTrkReceivedTime then use showStart time
 		if ((App.lastTrkReceivedTime == 'useShowStart') || (!App.lastTrkReceivedTime) || (App.lastTrkReceivedTime < showTimemin10)){
@@ -209,8 +209,8 @@ Meteor.methods({
 
 	  if (offsetAdjusted > 0){
 		
-		//if first time through then send back the track NDX to start on
-		if (whichTrkToStart === ''){whichTrkToStart = timeoutIdsNDX}
+		//if first time through then send back the track NDX to start on and set App.lastTrkReceived to autoPlayStarted indicated as such 
+		if (whichTrkToStart === ''){whichTrkToStart = timeoutIdsNDX; App.lastTrkReceivedTime = 'autoPlayStarted';}
 		
         timeoutIds[timeoutIdsNDX] = Meteor.setTimeout(function() {
           var nextTrack = Tracklists.findOne({
