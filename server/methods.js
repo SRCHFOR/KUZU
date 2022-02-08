@@ -87,8 +87,8 @@ Meteor.methods({
 	//var to = 'kuzu929fm@gmail.com'
 	var to = 'mlensing47@gmail.com'
 	var from = Accounts.emailTemplates.from
-	var subject = 'New User "' + user.emails[0].address + '" has registered and verified email.'
-	var message = 'New User "' + user.emails[0].address + '" has registered and verified email.'
+	var subject = 'New Producer "' + user.emails[0].address + '" has registered and verified email on app.'
+	var message = 'New Producer "' + user.emails[0].address + '" has registered and verified email on app.'
 	Email.send({ to, from, subject, message })
   },
   editTrack(modifier, _id) {
