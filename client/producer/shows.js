@@ -160,6 +160,19 @@ Template.producerShows.events({
 											}
 										})
   },
+  'click [data-restart-show-id]'(e, t) {
+    var showId = $(e.currentTarget).attr('data-restart-show-id')
+    Meteor.call('activateShow', showId, function(error, result){
+											if (!!error){
+												console.log(error)
+												console.log(error.reason)
+												alert("Error restarting show")
+											}
+											else{
+    											FlowRouter.go('liveShow')
+											}
+										})
+  },
   'click [data-delete-id]'(e, t) {
     if (confirm('Are You sure want to delete this?')) {
       var showId = $(e.currentTarget).attr('data-delete-id')
