@@ -21,12 +21,12 @@ const autoPlayTimeout = function(){
 												console.log(error);
 												console.log(error.reason);
 												console.log('Error on autoplayNextTrack')
-												alert('There was an error on enable AutoPlay. AutoPlay currently disabled.')
+												alert('There was an error on enable AutoPlay. You can Manually trigger autoplay by repressing Autoplay and pressing a track Start/Restart button.')
 											}
 											else{
 												if(!result){
 													console.log('Error on autoplayNextTrack result check server console')
-													alert('There was an error on enable AutoPlay. AutoPlay may be currently disabled.')
+													alert('There was an error on enable AutoPlay. You can Manually trigger autoplay by repressing Autoplay and pressing a track Start/Restart button.')
 												}
 												else{
 													alert('Show taking an unusual amount of time to be cued from station. AutoPlay now starting using show start for base timer.')
@@ -316,7 +316,7 @@ Template.liveShow.events({
 				
 		    	//Meteor.call("startNextTrack");
 		
-				alert('Autoplay will start immediately after show cued from station.')
+				alert('Autoplay will start immediately after show cued from station. You can Manually trigger autoplay by pressing a track Start/Restart button.')
 						
 				autoPlayWaiting.set(true)
 					
@@ -348,12 +348,12 @@ Template.liveShow.events({
 		    										console.log(error);
 		    										console.log(error.reason);
 													console.log('Error on chkShowTrkReceived > autoplayNextTrack')
-													alert('There was an error on enable AutoPlay. AutoPlay currently disabled.')
+													alert('There was an error on enable AutoPlay. You can Manually trigger autoplay by repressing Autoplay and pressing a track Start/Restart button.')
 		  										}
 												else{
 													if(!result){
 														console.log('Error on chkShowTrkReceived > autoplayNextTrack result check server console')
-														alert('There was an error on enable AutoPlay. AutoPlay currently disabled.')
+														alert('There was an error on enable AutoPlay. You can Manually trigger autoplay by repressing Autoplay and pressing a track Start/Restart button.')
 													}
 												}
 											})
@@ -377,12 +377,12 @@ Template.liveShow.events({
     						console.log(error);
     						console.log(error.reason);
 							console.log('Error on chkautoplayPressed > autoplayNextTrack.')
-							alert('There was an error on enable AutoPlay. AutoPlay currently disabled.')
+							alert('There was an error on enable AutoPlay. You can Manually trigger autoplay by repressing Autoplay and pressing a track Start/Restart button.')
   						}
 						else{
 							if(!result){
 								console.log('Error on chkautoplayPressed > autoplayNextTrack result check server console')
-								alert('There was an error on enable AutoPlay. AutoPlay currently disabled.')
+								alert('There was an error on enable AutoPlay. You can Manually trigger autoplay by repressing Autoplay and pressing a track Start/Restart button.')
 							}
 							else{
 								alert('AutoPlay Resuming.')
