@@ -147,6 +147,12 @@ Meteor.methods({
 	}
 	return false
   },
+  clearAutoTimer(){
+	for (var i = 0; i < timeoutIds.length; i++){
+		Meteor.clearTimeout(timeoutIds[i])
+	}
+	timeoutIds = []
+  },
   setAutoTimer(thisShowId, trackId){
 	//remove previous timers if any
 	for (var i = 0; i < timeoutIds.length; i++){

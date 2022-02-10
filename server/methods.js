@@ -107,7 +107,9 @@ Meteor.methods({
         })
   },
   deactivateShow(showId) {
-    Shows.update({ _id: showId }, { $set: { isActive: false, isAutoPlaying: false, autoStartEnd: false } })
+    Shows.update({ _id: showId }, { $set: { isActive: false, isAutoPlaying: false, autoStartEnd: false, autoPlayPressed: false } })
+	//remove previous autoplay timers if any
+	Meteor.call('clearAutoTimer')
     //App.fillAutoDJTrack()
   },
   incrementPosition(trackId) {

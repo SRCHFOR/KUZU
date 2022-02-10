@@ -316,7 +316,7 @@ Template.liveShow.events({
 				
 		    	//Meteor.call("startNextTrack");
 		
-				alert('Autoplay will start immediately after show cued from station. You can Manually trigger autoplay by pressing a track Start/Restart button.')
+				alert('Autoplay will start immediately after show cued from station. You can Manually trigger autoplay by pressing a track Start/Restart button. Show Restarts will need Manual triggering.')
 						
 				autoPlayWaiting.set(true)
 					

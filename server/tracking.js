@@ -66,9 +66,11 @@ Meteor.method(
 			var activeShowEndSubTen = new moment(new Date(activeShow.showEnd)).subtract(10, 'minutes').valueOf()
 			var currTIme = new Date().getTime()
 			//If current time is greater than 10 mins prior to showEnd of active show, deactivate show and reselect for active show to see if
+			//remove previous autoplay timers if any
 			//there's been a newly activated show since prior show deactivation or not.
 			if (currTIme >= activeShowEndSubTen){
-				Shows.update({ _id: activeShow._id }, { $set: { isActive: false, isAutoPlaying: false, autoStartEnd: false } })
+				Shows.update({ _id: activeShow._id }, { $set: { isActive: false, isAutoPlaying: false, autoStartEnd: false, autoPlayPressed: false } })
+				Meteor.call('clearAutoTimer')
 				activeShow = Shows.findOne({ isActive: true }) || false
 			}
 		}
