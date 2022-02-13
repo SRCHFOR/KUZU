@@ -95,7 +95,18 @@ Meteor.methods({
     Tracklists.update({ _id: _id }, modifier)
   },
   removeTrack(trackId) {
+	var showId = Tracklists.findOne({ _id: trackId }).showId
+	
     Tracklists.remove(trackId)
+
+	var indexNum = 0
+    var trackLists = Tracklists.find(
+          { showId: showId },
+          { sort: { indexNumber: 1 } }
+        ).fetch()
+    _.each(trackLists, function(trackList) {
+          Tracklists.update({ _id: trackList._id}, { $set: { indexNumber: indexNum++} })
+        })
   },
   removeAllTracks(showId) {
     var trackLists = Tracklists.find(
