@@ -28,10 +28,10 @@ App.sendAutoMsgs = function(msgShow, fromEmail, subjectLine, msgMsg){
 	var user = Meteor.users.findOne({ _id: msgShow.userId })
 	var to = ''
 	var subject = subjectLine
-	var message = msgMsg
+	var text = msgMsg
 	for (var i = 0; i < user.emails.length; i++){
 		to = user.emails[i].address
-    	Email.send({ to, fromEmail, subject, message });
+    	Email.send({ to, fromEmail, subject, text });
 	}
 	
 	if (msgShow.hasMessagingEnabled){

@@ -95,8 +95,8 @@ Meteor.method(
 				console.log('Bad result variable on autoplayNextTrack in tracking.js')
 				console.log(armedShow)
 				App.autoStartError = true
-				let subject = 'There has been an error AutoStarting your show. Manual Start Required.'
-				let message = 'There has been an error AutoStarting your show. Manual Start Required.'
+				let subject = 'AutoStart Error; Manual Start Required.'
+				let message = 'There has been an AutoStart error on your show. Manual Show Start Required.'
 				App.sendAutoMsgs(armedShow, Accounts.emailTemplates.from, subject, message)
         		Shows.update(
           			{ isArmedForAutoStart: true },
@@ -122,8 +122,8 @@ Meteor.method(
 			console.log('Error on autoplayNextTrack in tracking.js')
 			console.log(armedShow)
 			App.autoStartError = true
-			let subject = 'There has been an error AutoStarting your show. Manual Start Required.'
-			let message = 'There has been an error AutoStarting your show. Manual Start Required.'
+			let subject = 'AutoStart Error; Manual Start Required.'
+			let message = 'There has been an AutoStart error on your show. Manual Show Start Required.'
 			App.sendAutoMsgs(armedShow, Accounts.emailTemplates.from, subject, message)
         	Shows.update(
           		{ isArmedForAutoStart: true },

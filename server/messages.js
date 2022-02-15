@@ -67,7 +67,7 @@ Meteor.methods({
   },
   markUserMessagesRead() {
     Messages.update(
-      { producerId: this.userId },
+      { producerId: Meteor.userId() },
       { $set: { isRead: true } },
       { multi: true }
     )

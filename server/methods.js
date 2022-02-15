@@ -87,9 +87,9 @@ Meteor.methods({
 	//var to = 'kuzu929fm@gmail.com'
 	var to = 'mlensing47@gmail.com'
 	var from = Accounts.emailTemplates.from
-	var subject = 'New Producer "' + user.emails[0].address + '" has registered and verified email on app.'
-	var message = 'New Producer "' + user.emails[0].address + '" has registered and verified email on app.'
-	Email.send({ to, from, subject, message })
+	var subject = 'A New Producer has registered.'
+	var text = 'New Producer, "' + user.emails[0].address + '," has registered and verified their email on the producer app.'
+	Email.send({ to, from, subject, text })
   },
   editTrack(modifier, _id) {
     Tracklists.update({ _id: _id }, modifier)
@@ -187,7 +187,7 @@ Meteor.methods({
     FeatureRequests.remove({ _id: featureId })
   },
   createNewShow() {
-    var user = Meteor.users.findOne({ _id: this.userId })
+    var user = Meteor.users.findOne({ _id: Meteor.userId() })
     var showName = 'Kuzu Show'
     var showDescription = ' '
     var defaultMeta = 'Kuzu Show'
@@ -199,7 +199,7 @@ Meteor.methods({
       hasMessagingEnabled = user.producerProfile.isMessagingUIEnbled
     }
     Shows.insert({
-      userId: this.userId,
+      userId: Meteor.userId(),
       showName: showName,
       description: showDescription,
       defaultMeta: defaultMeta,
@@ -222,7 +222,7 @@ Meteor.methods({
 Meteor.method('removeUser', function(userId) {
   if (Meteor.user().isAdmin) {
     Meteor.users.remove(userId)
-  } else if (this.userId === userId) {
+  } else if (Meteor.userId() === userId) {
     Meteor.users.remove(userId)
   }
 })

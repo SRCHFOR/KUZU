@@ -75,7 +75,9 @@
     {{else}}
     <!--{{#if startTimeAfterCurrentDate}}-->{{#unless checkStartPressed _id}}
 	{{#if isTenMinutesPriorToShowTime _id}}
+	{{#if endTimeAfterCurrentDate}}
     <button class="btn btn-primary" data-activate-show-id="{{_id}}">Start Show</button>
+	{{/if}}
 	{{/if}}
 	{{else}}
 	{{#if endTimeAfterCurrentDate}}

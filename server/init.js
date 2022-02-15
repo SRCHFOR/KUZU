@@ -26,11 +26,11 @@ Meteor.startup(function(){
 																if ((show.tenMinutesPriorToShowTime()) && (timeNow <= show.showStart.getTime())){
 																	let to = ''
 																	let from = Accounts.emailTemplates.from
-																	let subject = '"' + show.showName + '" is about to begin.'
-																	let message = '"' + show.showName + '" is about to begin.'
+																	let subject = 'A KUZU show is about to begin.'
+																	let text = '"' + show.showName + '" will begin in about 10 mins.'
 																	for (var i = 0; i < subscriber.emails.length; i++){
 																		to = subscriber.emails[i].address
-    																	Email.send({ to, from, subject, message });
+    																	Email.send({ to, from, subject, text });
 																	}
 																	Shows.update({ _id: show._id }, { $set: { startMsgSent: true } })
 																}

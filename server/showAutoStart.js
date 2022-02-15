@@ -18,8 +18,8 @@ App.addAutoStartShow = function(showId) {
 	  Meteor.setTimeout(function(){
 		var show = Shows.findOne({ _id: showId })
 		if(!!show && !show.isActive && !show.startPressed){
-			let subject = '10 mins past show start; AutoStart yet to begin. Manual Start Required.'
-			let message = "Your Show's AutoStart has yet to begin. Please logon to producer.kuzu.fm to check show status."
+			let subject = 'AutoStart yet to begin; Manual Start Required.'
+			let message = "It's 10 mins past show start, and your Show's AutoStart has yet to begin. Please logon to producer.kuzu.fm to check show status. Manual Show start may be required."
 			App.sendAutoMsgs(show, Accounts.emailTemplates.from, subject, message)
         	Shows.update(
           		{ isArmedForAutoStart: true },
