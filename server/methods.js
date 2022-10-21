@@ -84,8 +84,8 @@ Meteor.methods({
     )
 
 	var user = Meteor.users.findOne({ _id: userId })
-	//var to = 'kuzu929fm@gmail.com'
-	var to = 'mlensing47@gmail.com'
+	var to = 'kuzu929fm@gmail.com'
+	//var to = 'put@email.here'
 	var from = Accounts.emailTemplates.from
 	var subject = 'A New Producer has registered.'
 	var text = 'New Producer, "' + user.emails[0].address + '," has registered and verified their email on the producer app.'

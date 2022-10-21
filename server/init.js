@@ -1,7 +1,7 @@
-process.env.MAIL_URL="smtps://mattlensing@gmail.com:"+Meteor.settings.gmailAppWord+"@smtp.gmail.com:465/";
-//process.env.MAIL_URL="smtps://kuzu929fm@gmail.com:"+Meteor.settings.gmailAppWord+"@smtp.gmail.com:465/";
-process.env.ROOT_URL="http://localhost:3000/"
-//process.env.ROOT_URL="http://producer.kuzu.fm/"
+//process.env.MAIL_URL="smtps://put@email.here:"+Meteor.settings.gmailAppWord+"@smtp.gmail.com:465/";
+process.env.MAIL_URL="smtps://kuzu929fm@gmail.com:"+Meteor.settings.gmailAppWord+"@smtp.gmail.com:465/";
+//process.env.ROOT_URL="http://localhost:3000/"
+process.env.ROOT_URL="http://producer.kuzu.fm/"
 Accounts.emailTemplates.siteName = "KUZU Producer Verification";
 Accounts.emailTemplates.from = "KUZU Accounts <KUZU929FM@GMAIL.COM>";
 Accounts.emailTemplates.verifyEmail = {
