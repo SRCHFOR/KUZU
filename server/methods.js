@@ -34,9 +34,11 @@ Meteor.methods({
         isShowingDefaultMeta: show.isShowingDefaultMeta,
         description: show.description,
         isShowingDescription: show.isShowingDescription,
+        hasMessagingEnabled: show.hasMessagingEnabled,
       },
       function(err, docInserted) {
 		if (!showObject.copyTracks){return}
+		if (!!err){console.log('duplicateShow .insert callback error');console.log(err);return;}
         var trackLists = Tracklists.find(
           { showId: show._id },
           { sort: { indexNumber: 1 } }
