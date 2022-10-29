@@ -80,14 +80,18 @@
 	{{/if}}
 	{{/if}}
 	{{else}}
+	{{#if showStartExists _id}}
 	{{#if endTimeAfterCurrentDate}}
     <button class="btn btn-primary" data-restart-show-id="{{_id}}">Restart Show</button>
     {{/if}}
+	{{/if}}
     <!--{{/if}}-->{{/unless}}
     {{/if}}
     {{#if currentUser.producerProfile.isAutomationUIEnabled}}
+	{{#if showStartExists _id}}
     {{#if endTimeAfterCurrentDate}}
     <button class="btn btn-warning" data-auto-start-show-id="{{_id}}">Auto Start and End is Off</button>
+    {{/if}}
     {{/if}}
     {{/if}}
     {{else}}

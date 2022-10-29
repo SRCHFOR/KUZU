@@ -12,20 +12,38 @@ Template.producerShows.helpers({
       this.userId === Meteor.userId()
     )
   },
+  //It is assumed that all shows before the startPressed field was implemented have been played
   showsWithDates() {
-    return Shows.find(
-      {
-        showStart: { $exists: true } , showEnd: { $exists: true },
-        $or: [{ userId: Meteor.userId() }, { helperUserId: Meteor.userId() }],
-      },
-      { sort: { showStart: -1 } }
+    return Shows.find({
+	  $and: [{
+        $or:[{
+			//bring in shows where startPressed exists and both showStart and showEnd exist.
+        	$and:[{startPressed: { $exists: true }}, {showStart: { $exists: true }}, {showEnd: { $exists: true }}]},{
+			//bring in shows where startPressed doesn't exist.
+			$and: [{
+				startPressed: { $exists: false }},{
+				$or: [{showStart: { $exists: false }}, {showEnd: { $exists: false }}]
+			}]},{
+			//bring in shows where startPressed exists and is true but showStart or showEnd doesn't exist
+			$and: [{
+				startPressed: { $exists: true }}, {startPressed: true},{
+				$or: [{showStart: { $exists: false }}, {showEnd: { $exists: false }}]
+			}]
+        }]},{
+        $or: [{ userId: Meteor.userId() }, { helperUserId: Meteor.userId() }]
+      }]
+    },
+    { sort: { showStart: -1 } }
     )
   },
+  //It is assumed that all shows before the startPressed field was implemented have been played
   showsWithoutDates() {
     return Shows.find({
 	  $and: [{
-      $or: [{showStart: { $exists: false } }, { showEnd: { $exists: false } }]},{
-      $or: [{ userId: Meteor.userId() }, { helperUserId: Meteor.userId() }]
+	  	//bring in only shows where startPressed exists and is false.
+		startPressed: { $exists: true }}, {startPressed: false},{
+      	$or: [{showStart: { $exists: false } }, { showEnd: { $exists: false } }]},{
+      	$or: [{ userId: Meteor.userId() }, { helperUserId: Meteor.userId() }]
       }]
     })
   },
