@@ -1,12 +1,20 @@
 <template name="producerMyProfile">
   {{#with currentUser}}
+  {{#unless $eq ($.Session.get "bioEditingId") _id}}
   <h2>{{producerProfile.name}}<small> - {{#if producerProfile.isPioneer}}Pioneer{{else}}Evergreen{{/if}}</small>
-    <span class="pull-right">{{#afModal doc=_id formId="updatePProfile" class="btn btn-primary"
+    <!--<span class="pull-right">{{#afModal doc=_id formId="updatePProfile" class="btn btn-primary"
       collection="Meteor.users" operation="update"
       fields="producerProfile.bio,producerProfile.name,producerProfile.isAutomationUIEnabled,producerProfile.isMessagingUIEnabled,producerProfile.isShowStartReminderEnabled,producerProfile.showStartReminderSubs"}}
       Edit Producer Profile
-      {{/afModal}}</span></h2>
-  <div class="clearfix"></div>
-  {{{producerProfile.bio}}}
+      {{/afModal}}</span>-->
+	<span class="pull-right">
+		<button class="btn btn-primary" data-edit-bio-id="{{_id}}">Edit Producer Profile</button>
+	</span>
+  </h2>
+  <!--<div class="clearfix"></div>-->
+  {{producerProfile.bio}}
+  {{else}}
+  {{> producerMyProfileAF}}
+  {{/unless}}
   {{/with}}
 </template>

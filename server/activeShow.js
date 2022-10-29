@@ -62,7 +62,14 @@ Meteor.methods({
 	return false
   },
   autoplayNextTrack() {
-	var thisShow = Shows.findOne({isActive: true}) || Shows.findOne({isArmedForAutoStart: true})
+	var thisShow = ''
+	var showArmed = Shows.findOne({isArmedForAutoStart: true})
+	if (!!showArmed){
+		thisShow = showArmed
+	}
+	else{
+		thisShow = Shows.findOne({isActive: true})
+	}
 	var thisShowId = thisShow._id
 	Shows.update({ _id: thisShowId }, { $set: { isAutoPlaying: true } })
 	

@@ -1,0 +1,13 @@
+<template name="producerMyProfileAF">
+  <div class="form-holder">
+    {{#autoForm collection="Meteor.users" id="producerMyProfileForm" type="update" doc=findBioUser}}
+    {{> afQuickField name="producerProfile.bio"}}
+    {{> afQuickField name="producerProfile.name"}}
+    {{> afQuickField name="producerProfile.isAutomationUIEnabled"}}
+    {{> afQuickField name="producerProfile.isMessagingUIEnabled"}}
+    {{> afQuickField name="producerProfile.isShowStartReminderEnabled"}}
+    {{> afQuickField name="producerProfile.showStartReminderSubs"}}
+    <button class="btn btn-primary" data-submit-bio-edit type="submit">Close</button>
+    {{/autoForm}}
+  </div>
+</template>

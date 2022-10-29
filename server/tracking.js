@@ -57,6 +57,8 @@ var currentHash = ''
 Meteor.method(
   'insertTrack',
   function(artist, songTitle, album, label, duration) {
+	//comment out this display on kuzu server when done gathering data
+	//console.log(artist + ' || ' + songTitle + ' || ' + album + ' || ' + label + ' || ' + duration)
 	App.autoStartError = false
 	var activeShow = Shows.findOne({ isActive: true }) || false
 	var armedShow = Shows.findOne({ isArmedForAutoStart: true })

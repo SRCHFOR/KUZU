@@ -1,0 +1,10 @@
+<template name="producerMyProgramAF">
+  <div class="form-holder">
+    {{#autoForm collection="Meteor.users" id="producerMyProgramForm" type="update" doc=findUser}}
+    {{> afQuickField name="producerProfile.showName"}}
+    {{> afQuickField name="producerProfile.defaultMeta"}}
+    {{> afQuickField name="producerProfile.description"}}
+    <button class="btn btn-primary" data-submit-user-edit type="submit">Close</button>
+    {{/autoForm}}
+  </div>
+</template>

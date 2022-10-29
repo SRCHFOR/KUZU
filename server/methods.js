@@ -95,18 +95,19 @@ Meteor.methods({
     Tracklists.update({ _id: _id }, modifier)
   },
   removeTrack(trackId) {
-	var showId = Tracklists.findOne({ _id: trackId }).showId
-	
+	var workTracklist = Tracklists.findOne({ _id: trackId })
     Tracklists.remove(trackId)
-
-	var indexNum = 0
-    var trackLists = Tracklists.find(
-          { showId: showId },
-          { sort: { indexNumber: 1 } }
-        ).fetch()
-    _.each(trackLists, function(trackList) {
-          Tracklists.update({ _id: trackList._id}, { $set: { indexNumber: indexNum++} })
-        })
+	if (!!workTracklist){
+		var showId = workTracklist.showId
+		var indexNum = 0
+    	var trackLists = Tracklists.find(
+          	{ showId: showId },
+          	{ sort: { indexNumber: 1 } }
+        	).fetch()
+    	_.each(trackLists, function(trackList) {
+          	Tracklists.update({ _id: trackList._id}, { $set: { indexNumber: indexNum++} })
+        	})
+	}
   },
   removeAllTracks(showId) {
     var trackLists = Tracklists.find(
@@ -196,14 +197,14 @@ Meteor.methods({
       showName = user.producerProfile.showName || 'Kuzu Show'
       showDescription = user.producerProfile.description || ''
       defaultMeta = user.producerProfile.defaultMeta || 'Kuzu Show'
-      hasMessagingEnabled = user.producerProfile.isMessagingUIEnbled
+      hasMessagingEnabled = user.producerProfile.isMessagingUIEnabled
     }
     Shows.insert({
       userId: Meteor.userId(),
       showName: showName,
       description: showDescription,
       defaultMeta: defaultMeta,
-      hasMessgingEnbled: hasMessagingEnabled,
+      hasMessagingEnabled: hasMessagingEnabled,
     })
   },
   clearPlaytime(trackId) {
