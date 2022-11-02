@@ -17,12 +17,14 @@
   <div style="background-color:#e7d0ba;margin-top:-21px;padding:15px 5px;">
     <a style="text-align:center;" href="{{#if currentUser.canLookAtLiveShow}}{{pathFor 'liveShow'}}{{/if}}">
       <div class="container">
-        <h3 style="color:#333;margin-top:10px;">{{showName}} is Live from {{prettifySimpleTime showStart}} -
-          {{prettifySimpleTime showEnd}}!</h3>
-        <h3 style="color:#333;margin-top:10px;">Playing <u style="color:#333;margin-top:10px;">{{currentPlayingSong}}</u> by <u style="color:#333;margin-top:10px;">{{currentPlayingArtist}}</u></h3>
+        <h3 style="color:rgb(129, 129, 129);margin-top:10px;"><span style="color:rgb(0, 0, 0);margin-top:10px;">{{showName}}</span> is Live from <span style="color:rgb(0, 0, 0);margin-top:10px;">{{prettifySimpleTime showStart}} -
+          {{prettifySimpleTime showEnd}}</span>!</h3>
+        <h3 style="color:rgb(129, 129, 129);margin-top:10px;">Playing <span style="color:rgb(0, 0, 0);margin-top:10px;">{{currentPlayingSong}}</span> by <span style="color:rgb(0, 0, 0);margin-top:10px;">{{currentPlayingArtist}}</span></h3>
       </div>
     </a>
   </div>
+  {{else}}
+  {{cancelSongArtistTimers}}
   {{/with}}
   {{/unless}}
   <div id="siteWrapper" class="clearfix">

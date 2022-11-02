@@ -1,3 +1,8 @@
+var currentPlayingSongVar = new ReactiveVar(false)
+var currentPlayingArtistVar = new ReactiveVar(false)
+var currentPlayingSongVarTimer = ''
+var currentPlayingArtistVarTimer = ''
+
 Template.HomeLayout.onCreated(function() {
   this.subscribe('activeShowTracks')
   this.isRadioLogikDown = new ReactiveVar(false)
@@ -20,27 +25,45 @@ Template.HomeLayout.helpers({
     }
   },
   currentPlayingSong() {
-	var currShow = ''
-    if (Meteor.user().isAdmin) {
-      currShow = Shows.findOne({ isActive: true })
-    } else {
-      currShow = Shows.findOne({ userId: Meteor.userId() }, { isActive: true })
-    }
-	var currTrack = currShow.currentPlayingTracklist()
-	if(!!currTrack){
-		return currTrack.songTitle
-	}
+	currentPlayingSongVarTimer = Meteor.setInterval(function(){
+	Meteor.call('getNicecastMeta', function(error, result){
+											if (!!error){
+												console.log("Error on HomeLayout currentPlayingSong getNicecastMeta call")
+												console.log(error)
+												console.log(error.reason)
+												currentPlayingSongVar.set('')
+											}
+											else{
+												currentPlayingSongVar.set(result.split(": ")[1].split("|Artist")[0])
+											}
+										})
+	},1000)
+	return currentPlayingSongVar.get()
   },
   currentPlayingArtist() {
-	var currShow = ''
-    if (Meteor.user().isAdmin) {
-      currShow = Shows.findOne({ isActive: true })
-    } else {
-      currShow = Shows.findOne({ userId: Meteor.userId() }, { isActive: true })
-    }
-	var currTrack = currShow.currentPlayingTracklist()
-	if(!!currTrack){
-		return currTrack.artist
+	currentPlayingArtistVarTimer = Meteor.setInterval(function(){
+	Meteor.call('getNicecastMeta', function(error, result){
+											if (!!error){
+												console.log("Error on HomeLayout currentPlayingArtist getNicecastMeta call")
+												console.log(error)
+												console.log(error.reason)
+												currentPlayingArtistVar.set('')
+											}
+											else{
+    											currentPlayingArtistVar.set(result.split(": ")[2].split("|Album")[0])
+											}
+										})
+	},1000)
+	return currentPlayingArtistVar.get()
+  },
+  cancelSongArtistTimers() {
+	if (!!currentPlayingSongVarTimer){
+		Meteor.clearInterval(currentPlayingSongVarTimer)
+		currentPlayingSongVarTimer = ''
+	}
+	if (!!currentPlayingArtistVarTimer){
+		Meteor.clearInterval(currentPlayingArtistVarTimer)
+		currentPlayingArtistVarTimer = ''
 	}
   },
   isRadioLogikDown() {
