@@ -17,13 +17,10 @@ Template.producerShows.helpers({
     return Shows.find({
 	  $and: [{
         $or:[{
+			//bring in shows where startPressed doesn't exist.
+			startPressed: { $exists: false }},{
 			//bring in shows where startPressed exists and both showStart and showEnd exist.
         	$and:[{startPressed: { $exists: true }}, {showStart: { $exists: true }}, {showEnd: { $exists: true }}]},{
-			//bring in shows where startPressed doesn't exist.
-			$and: [{
-				startPressed: { $exists: false }},{
-				$or: [{showStart: { $exists: false }}, {showEnd: { $exists: false }}]
-			}]},{
 			//bring in shows where startPressed exists and is true but showStart or showEnd doesn't exist
 			$and: [{
 				startPressed: { $exists: true }}, {startPressed: true},{
