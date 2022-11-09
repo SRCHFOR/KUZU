@@ -62,8 +62,9 @@ Meteor.method(
 	App.autoStartError = false
 	var activeShow = Shows.findOne({ isActive: true }) || false
 	var armedShow = Shows.findOne({ isArmedForAutoStart: true })
-    if (label.search(/<><>/g) !== -1) {
-        label = label.replace(/<><>/g, '')
+    if ((album.search(/<><>/g) !== -1) || (label.search(/<><>/g) !== -1)) {
+        if(album.search(/<><>/g) !== -1){album = label.replace(/<><>/g, '')}
+        if(label.search(/<><>/g) !== -1){label = label.replace(/<><>/g, '')}
 		if (!!activeShow){
 			var activeShowEndSubTen = new moment(new Date(activeShow.showEnd)).subtract(10, 'minutes').valueOf()
 			var currTIme = new Date().getTime()
