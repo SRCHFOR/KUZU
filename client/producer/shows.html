@@ -1,8 +1,8 @@
 <template name="producerShows">
   <h2>My Shows <button class="btn btn-primary" data-create-show>Create New Show</button>
-		<span class="pull-right">
+		<!--<span class="pull-right">-->
 	  		<button class="btn btn-primary" data-gimme-show-stats>Show Stats</button>
-      	</span>
+      	<!--</span>-->
   </h2>
   <div class="modal fade" id="duplicateShowModal">
     <div class="modal-dialog">
@@ -88,11 +88,13 @@
     <!--{{/if}}-->{{/unless}}
     {{/if}}
     {{#if currentUser.producerProfile.isAutomationUIEnabled}}
+	{{#unless checkStartPressed _id}}
 	{{#if showStartExists _id}}
     {{#if endTimeAfterCurrentDate}}
     <button class="btn btn-warning" data-auto-start-show-id="{{_id}}">Auto Start and End is Off</button>
     {{/if}}
     {{/if}}
+	{{/unless}}
     {{/if}}
     {{else}}
     {{#if currentUser.producerProfile.isAutomationUIEnabled}}

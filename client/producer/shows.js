@@ -250,8 +250,11 @@ Template.producerShows.events({
 										alert('There was an error on enable Auto Start. Auto Start currently disabled.')
   									}
 									else{
-										if(!result){
-											alert('All tracks must have a track length of at least "00:01" to enable Automation tools!')
+										if(result == 1){
+											alert('All tracks must be in MM:SS format and must have a track length of at least "00:01" to enable AutoStart!')
+										}
+										else if(result == 2){
+											alert('Tracks must be loaded to the show to enable AutoStart!')
 										}
 									}
 								})

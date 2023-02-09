@@ -18,15 +18,22 @@ App.addAutoStartShow = function(showId) {
 	  Meteor.setTimeout(function(){
 		var show = Shows.findOne({ _id: showId })
 		if(!!show && !show.isActive && !show.startPressed){
+			App.lastTrkReceivedTime = 'useShowStart'
+			var result = Meteor.call('autoStartArmedShow',show)
+			if(!result){
+				console.log('Bad result variable on autoStartArmedShow in showAutoStart.js')
+				console.log(result)
+			}
+			
 			let subject = 'AutoStart yet to begin; Manual Start Required.'
-			let message = "It's 10 mins past show start, and your Show's AutoStart has yet to begin. Please logon to producer.kuzu.fm to check show status. Manual Show start may be required."
+			let message = "It's 5 mins past show start, and your Show's AutoStart has yet to begin. Now Autostarting using Show Start time."
 			App.sendAutoMsgs(show, Accounts.emailTemplates.from, subject, message)
-        	Shows.update(
-          		{ isArmedForAutoStart: true },
-				{ $set: { isArmedForAutoStart: false, autoStartEnd: false, isAutoPlaying: false, autoPlayPressed: false, startPressed: false } }
-        	)
+        	//Shows.update(
+          	//	{ isArmedForAutoStart: true },
+			//	{ $set: { isArmedForAutoStart: false, autoStartEnd: false, isAutoPlaying: false, autoPlayPressed: false, startPressed: false } }
+        	//)
 		}
-	  },(new moment(new Date(show.showStart)).add(10, 'minutes').valueOf())-(new Date().getTime()))
+	  },(new moment(new Date(show.showStart)).add(5, 'minutes').valueOf())-(new Date().getTime()))
   }
   if (new Date(show.showStart).getTime() > new Date().getTime()) {
     var d = moment(show.showStart)
@@ -67,18 +74,22 @@ App.removeAutoStartShow = function(showId) {
 
 Meteor.methods({
   addAutoStartShow(showId) {
-	var verifyAuto = true
+	var verifyAuto = 0
 	var trackLists = Tracklists.find(
           { showId: showId },
           { sort: { indexNumber: 1 } }
         ).fetch()
-    _.each(trackLists, function(trackList) {
-          if (!trackList.trackLength || trackList.trackLength == '00:00' || !(/^\d\d\:\d\d$/.test(trackList.trackLength))){
-			  verifyAuto = false
-			  return
+	if (Object.keys(trackLists).length == 0){
+		verifyAuto = 2
+	}
+	else{
+    	_.each(trackLists, function(trackList) {
+          if (verifyAuto == 0 && (!trackList.trackLength || trackList.trackLength == '00:00' || !(/^\d\d\:\d\d$/.test(trackList.trackLength)))){
+			  verifyAuto = 1
 		  }
         })
-	if (verifyAuto){
+	}
+	if (verifyAuto == 0){
     	App.addAutoStartShow(showId)
     	Shows.update({ _id: showId }, { $set: { autoStartEnd: true } })
 	}

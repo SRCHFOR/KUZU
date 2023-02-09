@@ -1,3 +1,4 @@
+import momenttz from 'moment-timezone'
 Template.registerHelper('json', function(a) {
   try {
     return JSON.stringify(a)
@@ -13,7 +14,7 @@ Template.registerHelper('prettifyTime', date => {
   if (!date) {
     return ''
   }
-  var date = new moment(date).format('hh:mm:ss')
+  var date = momenttz(new Date(date)).tz('America/Chicago').format('hh:mm:ss')//new moment(date).format('hh:mm:ss')
   return date
 })
 
@@ -21,13 +22,13 @@ Template.registerHelper('prettifyDate', date => {
   if (!date) {
     return ''
   }
-  var date = new moment(date).format('MMM DD')
+  var date = momenttz(new Date(date)).tz('America/Chicago').format('MMM DD')//new moment(date).format('MMM DD')
   return date
 })
 Template.registerHelper('prettifySimpleTime', date => {
   if (!date) {
     return ''
   }
-  var date = new moment(date).format('h:mm a')
+  var date = momenttz(new Date(date)).tz('America/Chicago').format('h:mm a')//new moment(date).format('h:mm a')
   return date
 })

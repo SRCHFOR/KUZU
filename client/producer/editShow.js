@@ -1,3 +1,4 @@
+import momenttz from 'moment-timezone'
 Template.editShowInline.onCreated(function() {
   this.autorun(() => {
     this.subscribe('singleShow', this.data._id)
@@ -16,8 +17,8 @@ Template.editShowInline.events({
 	var showStart = AutoForm.getFieldValue("showStart", "editShowInlineForm")
 	var showEnd = AutoForm.getFieldValue("showEnd", "editShowInlineForm")
 	if (!!showStart && !!showEnd){
-		var timeshowStart = new Date(showStart).getTime()
-		var timeshowEnd = new Date(showEnd).getTime()
+		var timeshowStart = new moment(momenttz(new Date(showStart)).tz('America/Chicago')).valueOf()//new Date(showStart).getTime()
+		var timeshowEnd = new moment(momenttz(new Date(showEnd)).tz('America/Chicago')).valueOf()//new Date(showEnd).getTime()
     	if(timeshowEnd <= timeshowStart){
 			alert('Show End must be greater than Show Start')
 		}

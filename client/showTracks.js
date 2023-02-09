@@ -1,3 +1,4 @@
+//import momenttz from 'moment-timezone'
 Template.showTracks.onCreated(function() {
   Template.instance().uploading = new ReactiveVar(false)
   this.autorun(() => {
@@ -17,7 +18,7 @@ Template.showTracks.helpers({
 	return Shows.findOne({userId: Meteor.userId(),_id: FlowRouter.getParam('showId'),}).startPressed
   },
   trackPlayed(trackId){
-	var playDate = Tracklists.findOne({ _id: trackId }).playDate
+	var playDate = Tracklists.findOne({ _id: trackId }).playDate//momenttz(new Date(Tracklists.findOne({ _id: trackId }).playDate)).tz('America/Chicago')
 	return playDate
   },
   showMain() {

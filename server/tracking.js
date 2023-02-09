@@ -58,7 +58,10 @@ Meteor.method(
   'insertTrack',
   function(artist, songTitle, album, label, duration) {
 	//comment out this display on kuzu server when done gathering data
-	//console.log(artist + ' || ' + songTitle + ' || ' + album + ' || ' + label + ' || ' + duration)
+	//if(artist.search(/<><>/g) !== -1){console.log(artist + ' || ' + songTitle + ' || ' + album + ' || ' + label + ' || ' + duration)}
+    //if(songTitle.search(/<><>/g) !== -1){console.log(artist + ' || ' + songTitle + ' || ' + album + ' || ' + label + ' || ' + duration)}
+    //if(album.search(/<><>/g) !== -1){console.log(artist + ' || ' + songTitle + ' || ' + album + ' || ' + label + ' || ' + duration)}
+    //if(label.search(/<><>/g) !== -1){console.log(artist + ' || ' + songTitle + ' || ' + album + ' || ' + label + ' || ' + duration)}
 	App.autoStartError = false
 	var activeShow = Shows.findOne({ isActive: true }) || false
 	var armedShow = Shows.findOne({ isArmedForAutoStart: true })
@@ -67,73 +70,42 @@ Meteor.method(
         if(label.search(/<><>/g) !== -1){label = label.replace(/<><>/g, '')}
 		if (!!activeShow){
 			var activeShowEndSubTen = new moment(new Date(activeShow.showEnd)).subtract(10, 'minutes').valueOf()
-			var currTIme = new Date().getTime()
+			var currTime = new Date().getTime()
 			//If current time is greater than 10 mins prior to showEnd of active show, deactivate show and reselect for active show to see if
 			//remove previous autoplay timers if any
 			//there's been a newly activated show since prior show deactivation or not.
-			if (currTIme >= activeShowEndSubTen){
+			if (currTime >= activeShowEndSubTen){
 				Shows.update({ _id: activeShow._id }, { $set: { isActive: false, isAutoPlaying: false, autoStartEnd: false, autoPlayPressed: false } })
 				Meteor.call('clearAutoTimer')
 				activeShow = Shows.findOne({ isActive: true }) || false
 			}
 		}
-		App.lastTrkReceivedTime = ''
 		App.lastTrkAcknowledged = false
+		var currMin = new moment(new Date()).minute()
+		if ((currMin >= "55" && currMin <= "59") || (currMin >= "00" && currMin <= "05")){
+			App.lastTrkReceivedTime = ''
+			console.log('hi1')
+		}
+		else{
+			console.log('hi2')
+			App.lastTrkReceivedTime = 'useShowStart'
+		}
     } 
 	else {
 	  if (!App.lastTrkReceivedTime){
 	  	App.lastTrkReceivedTime = new moment(new Date()).valueOf()
-	  }
+	
+	  	if (!!armedShow) {
+			var result = Meteor.call('autoStartArmedShow',armedShow)
+			if(!result){
+				console.log('Bad result variable on autoStartArmedShow in tracking.js')
+				console.log(result)
+			}
+	  	}
+      }
 	  else{
 		App.lastTrkReceivedTime = 'useShowStart'
 	  }
-
-	  if (!!armedShow) {
-		//Set some fields for proper workage
-		App.lastTrkAcknowledged = true;
-		Shows.update({ _id: armedShow._id },{ $set: { autoPlayPressed: false, showTrkAcknowledged: true } })
-		try{
-        	var result = Meteor.call('autoplayNextTrack')
-  			if(!result){
-				console.log('Bad result variable on autoplayNextTrack in tracking.js')
-				console.log(armedShow)
-				App.autoStartError = true
-				let subject = 'AutoStart Error; Manual Start Required.'
-				let message = 'There has been an AutoStart error on your show. Manual Show Start Required.'
-				App.sendAutoMsgs(armedShow, Accounts.emailTemplates.from, subject, message)
-        		Shows.update(
-          			{ isArmedForAutoStart: true },
-					{ $set: { isArmedForAutoStart: false, autoStartEnd: false, isAutoPlaying: false, autoPlayPressed: false, startPressed: false } }
-        		)
-			}
-			else{
-				App.autoStartError = false
-        		Shows.update(
-          			{ isActive: true },
-          			{ $set: { isActive: false, isAutoPlaying: false, autoStartEnd: false } },
-          			{ multi: true }
-        		)
-        		Shows.update(
-          			{ isArmedForAutoStart: true },
-					//startPressed set after autoplayNextTrack call in autostart so that autoplayNextTrack works correctly but autostart can still simulate actual startPressed functionality later
-          			{ $set: { isActive: true, isArmedForAutoStart: false, startPressed: true } }
-        		)
-			}
-		}
-		catch(error){
-    		console.log(error);
-			console.log('Error on autoplayNextTrack in tracking.js')
-			console.log(armedShow)
-			App.autoStartError = true
-			let subject = 'AutoStart Error; Manual Start Required.'
-			let message = 'There has been an AutoStart error on your show. Manual Show Start Required.'
-			App.sendAutoMsgs(armedShow, Accounts.emailTemplates.from, subject, message)
-        	Shows.update(
-          		{ isArmedForAutoStart: true },
-				{ $set: { isArmedForAutoStart: false, autoStartEnd: false, isAutoPlaying: false, autoPlayPressed: false, startPressed: false } }
-        	)
-		}
-      }
     }
 
     if (!activeShow || activeShow.hasRadioLogikTracking) {

@@ -1,4 +1,3 @@
-import momenttz from 'moment-timezone'
 Meteor.methods({
   download: function(dateFrom = false, dateTo = false) {
     var collection = ''
@@ -213,12 +212,58 @@ Meteor.methods({
     Tracklists.update({ _id: trackId }, { $unset: { playDate: '' } })
   },
   serverTime(){
-	var centralTime = momenttz(new Date()).tz('America/Chicago')
-	return centralTime.format('l') + ', ' + centralTime.format('LTS')
+	return new moment(new Date()).valueOf()
   },
   getAllUserShows(){
 	var users = Meteor.users.find().fetch()
 	return users
+  },
+  autoStartArmedShow(armedShow){
+		//Set some fields for proper workage
+		App.lastTrkAcknowledged = true;
+		Shows.update({ _id: armedShow._id },{ $set: { autoPlayPressed: false, showTrkAcknowledged: true } })
+		try{
+        	var result = Meteor.call('autoplayNextTrack')
+  			if(!result){
+				console.log('Bad result variable on autoplayNextTrack in methods.js call')
+				console.log(result)
+				console.log(armedShow)
+				App.autoStartError = true
+				let subject = 'AutoStart Error; Manual Start Required.'
+				let message = 'There has been an AutoStart error on your show. Manual Show Start Required.'
+				App.sendAutoMsgs(armedShow, Accounts.emailTemplates.from, subject, message)
+        		Shows.update(
+          			{ isArmedForAutoStart: true },
+					{ $set: { isArmedForAutoStart: false, autoStartEnd: false, isAutoPlaying: false, autoPlayPressed: false, startPressed: false } }
+        		)
+			}
+			else{
+				App.autoStartError = false
+        		Shows.update(
+          			{ isActive: true },
+          			{ $set: { isActive: false, isAutoPlaying: false, autoStartEnd: false } },
+          			{ multi: true }
+        		)
+        		Shows.update(
+          			{ isArmedForAutoStart: true },
+					//startPressed set after autoplayNextTrack call in autostart so that autoplayNextTrack works correctly but autostart can still simulate actual startPressed functionality later
+          			{ $set: { isActive: true, isArmedForAutoStart: false, startPressed: true } }
+        		)
+			}
+		}
+		catch(error){
+    		console.log(error);
+			console.log('Error on autoplayNextTrack in tracking.js')
+			console.log(armedShow)
+			App.autoStartError = true
+			let subject = 'AutoStart Error; Manual Start Required.'
+			let message = 'There has been an AutoStart error on your show. Manual Show Start Required.'
+			App.sendAutoMsgs(armedShow, Accounts.emailTemplates.from, subject, message)
+        	Shows.update(
+          		{ isArmedForAutoStart: true },
+				{ $set: { isArmedForAutoStart: false, autoStartEnd: false, isAutoPlaying: false, autoPlayPressed: false, startPressed: false } }
+        	)
+		}
   }
 })
 

@@ -1,3 +1,4 @@
+import momenttz from 'moment-timezone'
 Template.adminShows.helpers({
   showsIndex() {
     return ShowsIndex
@@ -6,10 +7,10 @@ Template.adminShows.helpers({
 
 Template.adminShows.helpers({
   endTimeAfterCurrentDate() {
-    var showEnd = moment(new Date(this.showEnd))
+    var showEnd = new moment(momenttz(new Date(this.showEnd)).tz('America/Chicago'))//new moment(new Date(this.showEnd))
       .add(10, 'minutes')
       .valueOf()
-    var timeNow = new Date().getTime()
+    var timeNow = momenttz(new Date()).tz('America/Chicago')//new Date().getTime()
     return timeNow <= showEnd
   },
 })
@@ -65,8 +66,11 @@ Template.adminShows.events({
 										alert('There was an error on enable Auto Start. Auto Start currently disabled.')
   									}
 									else{
-										if(!result){
-											alert('All tracks must have a track length of at least "00:01" to enable Automation tools!')
+										if(result == 1){
+											alert('All tracks must be in MM:SS format and must have a track length of at least "00:01" to enable AutoStart!')
+										}
+										else if(result == 2){
+											alert('Tracks must be loaded to the show to enable AutoStart!')
 										}
 									}
 								})
