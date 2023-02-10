@@ -20,7 +20,7 @@ App.addAutoStartShow = function(showId) {
 		if(!!show && !show.isActive && !show.startPressed){
 			App.lastTrkReceivedTime = 'useShowStart'
 			var result = Meteor.call('autoStartArmedShow',show)
-			if(!result){
+			if(!!result){
 				console.log('Bad result variable on autoStartArmedShow in showAutoStart.js')
 				console.log(result)
 			}

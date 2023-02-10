@@ -82,22 +82,26 @@ Meteor.method(
 		}
 		App.lastTrkAcknowledged = false
 		var currMin = new moment(new Date()).minute()
+		//console.log('hi3')
+		//first if statement for testing at any time
+		//if ((currMin >= "50" && currMin <= "54") || (currMin >= "55" && currMin <= "59")){
 		if ((currMin >= "55" && currMin <= "59") || (currMin >= "00" && currMin <= "05")){
 			App.lastTrkReceivedTime = ''
-			console.log('hi1')
+			//console.log('hi1')
 		}
 		else{
-			console.log('hi2')
+			//console.log('hi2')
 			App.lastTrkReceivedTime = 'useShowStart'
 		}
     } 
 	else {
+	  //console.log(App.lastTrkReceivedTime)
 	  if (!App.lastTrkReceivedTime){
 	  	App.lastTrkReceivedTime = new moment(new Date()).valueOf()
 	
 	  	if (!!armedShow) {
 			var result = Meteor.call('autoStartArmedShow',armedShow)
-			if(!result){
+			if(!!result){
 				console.log('Bad result variable on autoStartArmedShow in tracking.js')
 				console.log(result)
 			}
