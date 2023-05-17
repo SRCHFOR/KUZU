@@ -1,4 +1,4 @@
-import momenttz from 'moment-timezone'
+//import momenttz from 'moment-timezone'
 var date = new ReactiveVar(new Date().toLocaleString());
 var checkActiveShow = new ReactiveVar(false);
 var autoPlayWaiting = new ReactiveVar(false);
@@ -9,8 +9,10 @@ var showStartTimeout = '';
 var showStartInterval = '';
 const autoPlayTimeout = function(){
 								if (!showStartTimeout){
-									var currshowStart = new moment(momenttz(new Date(Shows.findOne({ isActive: true }).showStart)).tz('America/Chicago')).valueOf()//Shows.findOne({ isActive: true }).showStart.getTime()
-									var currTimeMin5 = new moment(momenttz(new Date()).tz('America/Chicago')).subtract(5, 'minutes').valueOf()//new moment(new Date()).subtract(5, 'minutes').valueOf()
+									var currshowStart = Shows.findOne({ isActive: true }).showStart.getTime()
+									var currTimeMin5 = new moment(new Date()).subtract(5, 'minutes').valueOf()
+									//var currshowStart = new moment(momenttz(new Date(Shows.findOne({ isActive: true }).showStart)).tz('America/Chicago')).valueOf()
+									//var currTimeMin5 = new moment(momenttz(new Date()).tz('America/Chicago')).subtract(5, 'minutes').valueOf()
 									
 									showStartTimeout = Meteor.setTimeout(function(){
 										Meteor.clearInterval(showStartInterval)
@@ -49,9 +51,10 @@ Template.liveShow.onCreated(function() {
   									}
 									else{
 										//date.set(result.toLocaleString())
-										var centralTime = momenttz(new Date(result)).tz('America/Chicago')
-										centralTime = centralTime.format('l') + ', ' + centralTime.format('LTS')
-										date.set(centralTime)
+										date.set(result)
+										//var centralTime = momenttz(new Date(result)).tz('America/Chicago')
+										//centralTime = centralTime.format('l') + ', ' + centralTime.format('LTS')
+										//date.set(centralTime)
 									}
 								})}, 1000)
 
@@ -140,6 +143,8 @@ Template.liveShow.helpers({
 			constructDate = constructDate + ' ' + realTime.substr(12,8)
 		}
 	}
+	//var time = Blaze._globalHelpers['prettifyTime'].call('prettifyTime',constructDate)
+	//var day = Blaze._globalHelpers['prettifyDate'].call('prettifyDate',constructDate)
 	var time = moment(new Date(constructDate)).format('hh:mm:ss')
 	var day = moment(new Date(constructDate)).format('MMM DD')
     return time + ' ' + day

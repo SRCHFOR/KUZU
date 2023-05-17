@@ -1,4 +1,4 @@
-import momenttz from 'moment-timezone'
+//import momenttz from 'moment-timezone'
 Template.adminShows.helpers({
   showsIndex() {
     return ShowsIndex
@@ -7,10 +7,12 @@ Template.adminShows.helpers({
 
 Template.adminShows.helpers({
   endTimeAfterCurrentDate() {
-    var showEnd = new moment(momenttz(new Date(this.showEnd)).tz('America/Chicago'))//new moment(new Date(this.showEnd))
+	var showEnd = moment(new Date(this.showEnd))
+    //var showEnd = new moment(momenttz(new Date(this.showEnd)).tz('America/Chicago'))
       .add(10, 'minutes')
       .valueOf()
-    var timeNow = momenttz(new Date()).tz('America/Chicago')//new Date().getTime()
+	var timeNow = new Date().getTime()
+    //var timeNow = momenttz(new Date()).tz('America/Chicago')
     return timeNow <= showEnd
   },
 })

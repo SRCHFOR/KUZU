@@ -11,6 +11,8 @@ Meteor.startup(function() {
 })
 
 App.addAutoStartShow = function(showId) {
+  var subject = ''
+  var message = ''
   var show = Shows.findOne({ _id: showId })
   var pastShowTime = function(){
 	  //add timeout so if autostart hasn't begun by 5 mins after showStart then send error msg/email to alert user
@@ -25,8 +27,8 @@ App.addAutoStartShow = function(showId) {
 				console.log(result)
 			}
 			
-			let subject = 'AutoStart yet to begin; Manual Start Required.'
-			let message = "It's 5 mins past show start, and your Show's AutoStart has yet to begin. Now Autostarting using Show Start time."
+			subject = 'AutoStart yet to begin; Manual Start Required.'
+			message = "It's 5 mins past show start, and your Show's AutoStart has yet to begin. Now Autostarting using Show Start time."
 			App.sendAutoMsgs(show, Accounts.emailTemplates.from, subject, message)
         	//Shows.update(
           	//	{ isArmedForAutoStart: true },

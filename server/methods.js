@@ -1,3 +1,4 @@
+import momenttz from 'moment-timezone'
 Meteor.methods({
   download: function(dateFrom = false, dateTo = false) {
     var collection = ''
@@ -50,7 +51,8 @@ Meteor.methods({
             album: trackList.album,
             label: trackList.label,
             trackLength: trackList.trackLength,
-          })
+          },function(err, docInserted){if(err){if(err.code == 11000){}else{console.log(err);console.log(docInserted);}}}
+		  )
         })
       }
     )
@@ -212,13 +214,17 @@ Meteor.methods({
     Tracklists.update({ _id: trackId }, { $unset: { playDate: '' } })
   },
   serverTime(){
-	return new moment(new Date()).valueOf()
+	var centralTime = momenttz(new Date()).tz('America/Chicago')
+	return centralTime.format('l') + ', ' + centralTime.format('LTS')
+	//return new moment(new Date()).valueOf()
   },
   getAllUserShows(){
 	var users = Meteor.users.find().fetch()
 	return users
   },
   autoStartArmedShow(armedShow){
+		var subject = ''
+		var message = ''
 		//Set some fields for proper workage
 		App.lastTrkAcknowledged = true;
 		Shows.update({ _id: armedShow._id },{ $set: { autoPlayPressed: false, showTrkAcknowledged: true } })
@@ -229,8 +235,8 @@ Meteor.methods({
 				console.log(result)
 				console.log(armedShow)
 				App.autoStartError = true
-				let subject = 'AutoStart Error; Manual Start Required.'
-				let message = 'There has been an AutoStart error on your show. Manual Show Start Required.'
+				subject = 'AutoStart Error; Manual Start Required.'
+				message = 'There has been an AutoStart error on your show. Manual Show Start Required.'
 				App.sendAutoMsgs(armedShow, Accounts.emailTemplates.from, subject, message)
         		Shows.update(
           			{ isArmedForAutoStart: true },
@@ -256,8 +262,8 @@ Meteor.methods({
 			console.log('Error on autoplayNextTrack in tracking.js')
 			console.log(armedShow)
 			App.autoStartError = true
-			let subject = 'AutoStart Error; Manual Start Required.'
-			let message = 'There has been an AutoStart error on your show. Manual Show Start Required.'
+			subject = 'AutoStart Error; Manual Start Required.'
+			message = 'There has been an AutoStart error on your show. Manual Show Start Required.'
 			App.sendAutoMsgs(armedShow, Accounts.emailTemplates.from, subject, message)
         	Shows.update(
           		{ isArmedForAutoStart: true },

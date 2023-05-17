@@ -62,6 +62,8 @@ Meteor.methods({
 	return false
   },
   autoplayNextTrack() {
+	var subject = ''
+	var message = ''
 	var thisShow = ''
 	var showArmed = Shows.findOne({isArmedForAutoStart: true})
 	if (!!showArmed){
@@ -80,8 +82,8 @@ Meteor.methods({
 			if (!result && result !== 0){
 				Shows.update({ _id: thisShowId }, { $set: { isAutoPlaying: false } })
 				console.log('autoplayNextTrack found no tracks to autoplay. ShowID: ' + thisShowId)
-				let subject = 'AutoPlay Not Activated.'
-				let message = 'No tracks where calculated to play during specified show time. Manual Autoplay still available.'
+				subject = 'AutoPlay Not Activated.'
+				message = 'No tracks where calculated to play during specified show time. Manual Autoplay still available.'
 				App.sendAutoMsgs(thisShow, Accounts.emailTemplates.from, subject, message)
 			}
 			else{
@@ -99,8 +101,8 @@ Meteor.methods({
 			console.log(error);
     		console.log(error.reason);
 			console.log('Error Setting AutoTimer in autoplayNextTrack')
-			let subject = 'AutoPlay Failure.'
-			let message = 'Error setting autotimer in autoplayNextTrack. Try Manual Autoplay.'
+			subject = 'AutoPlay Failure.'
+			message = 'Error setting autotimer in autoplayNextTrack. Try Manual Autoplay.'
 			App.sendAutoMsgs(thisShow, Accounts.emailTemplates.from, subject, message)
 		}
 	}
@@ -112,6 +114,8 @@ Meteor.methods({
 	return false
   },
   manualAutoPlay(trackId) {
+	var subject = ''
+	var message = ''
 	var thisShow = Shows.findOne({isActive: true})
 	var thisShowId = thisShow._id
 	Shows.update({ _id: thisShowId }, { $set: { isAutoPlaying: true } })
@@ -123,8 +127,8 @@ Meteor.methods({
 		if (!result && result !== 0){
 			Shows.update({ _id: thisShowId }, { $set: { isAutoPlaying: false } })
 			console.log('manualAutoPlay found no tracks to autoplay. ShowID: ' + thisShowId)
-			let subject = 'AutoPlay Not Activated.'
-			let message = 'No tracks where calculated to play during specified show time. Manual Autoplay still available.'
+			subject = 'AutoPlay Not Activated.'
+			message = 'No tracks where calculated to play during specified show time. Manual Autoplay still available.'
 			App.sendAutoMsgs(thisShow, Accounts.emailTemplates.from, subject, message)
 		}
 		else{
@@ -143,8 +147,8 @@ Meteor.methods({
 		console.log(error);
     	console.log(error.reason);
 		console.log('Error Setting AutoTimer in manualAutoPlay')
-		let subject = 'MANUAL AutoPlay Failure.'
-		let message = 'Error setting autotimer in manualAutoPlay. Use regular show controls.'
+		subject = 'MANUAL AutoPlay Failure.'
+		message = 'Error setting autotimer in manualAutoPlay. Use regular show controls.'
 		App.sendAutoMsgs(thisShow, Accounts.emailTemplates.from, subject, message)
 	}
 	
@@ -161,6 +165,8 @@ Meteor.methods({
 	timeoutIds = []
   },
   setAutoTimer(thisShowId, trackId){
+	var subject = ''
+	var message = ''
 	//remove previous timers if any
 	for (var i = 0; i < timeoutIds.length; i++){
 		Meteor.clearTimeout(timeoutIds[i])
@@ -238,8 +244,8 @@ Meteor.methods({
 				console.log(error);
 				console.log(error.reason);
 				console.log('Error on startTrack in setAutoTimer track timeout. Track._id: "'+nextTrack._id+'"')
-				let subject = 'Error during AutoPlay.'
-				let message = 'Track "'+nextTrack.songTitle+'" not started during AutoPlay. AutoPlay will try to continue. Manual Autoplay recommended.'
+				subject = 'Error during AutoPlay.'
+				message = 'Track "'+nextTrack.songTitle+'" not started during AutoPlay. AutoPlay will try to continue. Manual Autoplay recommended.'
 				App.sendAutoMsgs(thisShowSnapshot, Accounts.emailTemplates.from, subject, message)
 			}
           } 

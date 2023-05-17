@@ -57,6 +57,10 @@ var currentHash = ''
 Meteor.method(
   'insertTrack',
   function(artist, songTitle, album, label, duration) {
+	if (artist === undefined){artist = 'undefined'}
+	if (songTitle === undefined){songTitle = 'undefined'}
+	if (album === undefined){album = 'undefined'}
+	if (label === undefined){label = 'undefined'}
 	//comment out this display on kuzu server when done gathering data
 	//if(artist.search(/<><>/g) !== -1){console.log(artist + ' || ' + songTitle + ' || ' + album + ' || ' + label + ' || ' + duration)}
     //if(songTitle.search(/<><>/g) !== -1){console.log(artist + ' || ' + songTitle + ' || ' + album + ' || ' + label + ' || ' + duration)}

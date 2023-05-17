@@ -1,4 +1,4 @@
-import momenttz from 'moment-timezone'
+//import momenttz from 'moment-timezone'
 Template.showStats.onCreated(function() {
   this.autorun(() => {
 	this.subscribe('producerShows')
@@ -60,7 +60,8 @@ Template.showStats.onRendered(function() {
 					if (allUserShows[docNo]._id == allUserTracks[docNo2].showId){
 						if (!!allUserTracks[docNo2].playDate){
 							allUserTracks[docNo2].playDate = allUserTracks[docNo2].playDate.toLocaleString()
-							allUserTracks[docNo2].playDate = momenttz(new Date(allUserTracks[docNo2].playDate)).tz('America/Chicago')//allUserTracks[docNo2].playDate.toLocaleString()
+							allUserTracks[docNo2].playDate.toLocaleString()
+							//allUserTracks[docNo2].playDate = momenttz(new Date(allUserTracks[docNo2].playDate)).tz('America/Chicago')
 						}
 						if (!!allUserTracks[docNo2].showId){
 							delete allUserTracks[docNo2].showId
@@ -97,7 +98,8 @@ Template.showStats.onRendered(function() {
 							showName: allUserShows[docNo].showName
 						}
 						if (!!returnAllUserTracks[docNo3].playDate){
-							returnAllUserTracks[docNo3].playDate = momenttz(new Date(returnAllUserTracks[docNo3].playDate)).tz('America/Chicago').format('MMMM Do YYYY, h:mm:ss a')//returnAllUserTracks[docNo3].playDate.toLocaleString()
+							returnAllUserTracks[docNo3].playDate = new moment(new Date(returnAllUserTracks[docNo3].playDate)).format('MMMM Do YYYY, h:mm:ss a')
+							//returnAllUserTracks[docNo3].playDate = momenttz(new Date(returnAllUserTracks[docNo3].playDate)).tz('America/Chicago').format('MMMM Do YYYY, h:mm:ss a')
 						}
 						if (!!returnAllUserTracks[docNo3].showId){
 							delete returnAllUserTracks[docNo3].showId

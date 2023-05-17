@@ -1,4 +1,4 @@
-import momenttz from 'moment-timezone'
+//import momenttz from 'moment-timezone'
 Template.calendar.helpers({
   options: function() {
     var self = Template.instance()
@@ -28,8 +28,10 @@ Template.calendar.helpers({
       eventRender(session, element) {
         var sd = new Date(session.showStart)
         var ed = new Date(session.showEnd)
-        var startDate = momenttz(sd).tz('America/Chicago').format('h:mm a')//moment(sd).format('h:mm a')
-        var endDate = momenttz(ed).tz('America/Chicago').format('h:mm a')//moment(ed).format('h:mm a')
+		var startDate = moment(sd).format('h:mm a')
+        var endDate = moment(ed).format('h:mm a')
+        //var startDate = momenttz(sd).tz('America/Chicago').format('h:mm a')
+        //var endDate = momenttz(ed).tz('America/Chicago').format('h:mm a')
         element
           .find('.fc-content')
           .html(
@@ -49,12 +51,14 @@ Template.calendar.helpers({
 
 Template.calendar.onCreated(function() {
   this.startDate = new ReactiveVar(
-    moment(momenttz(new Date()).tz('America/Chicago'))//moment(new Date())
+	moment(new Date())
+    //moment(momenttz(new Date()).tz('America/Chicago'))
       .subtract(1, 'month')
       .toDate()
   )
   this.endDate = new ReactiveVar(
-    moment(momenttz(new Date()).tz('America/Chicago'))//moment(new Date())
+	moment(new Date())
+    //moment(momenttz(new Date()).tz('America/Chicago'))
       .add(1, 'month')
       .toDate()
   )
