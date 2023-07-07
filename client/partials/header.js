@@ -46,15 +46,7 @@ Template.HomeLayout.onCreated(function() {
 })
 
 Template.HomeLayout.helpers({
-  	currentActiveShow() {
-    	return Shows.findOne({ isActive: true })
-  	},
+  currentActiveShow() {
+    return Shows.findOne({ isActive: true })
+  },
 })
-
-Template.HomeLayout.events({
-	'click .logout': function(event){
-		console.log('hi')
-		event.preventDefault();
-		AccountsTemplates.logout();
-	},
-});
