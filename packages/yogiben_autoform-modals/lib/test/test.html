@@ -1,0 +1,50 @@
+<head>
+   <title>meteorApp</title>
+</head>
+ 
+<body>
+   <div id = "myContainer">
+   </div>
+</body>
+
+<template name = "myNewTemplate">
+   <p>Text from my new template...</p>
+   
+     <h2>My Shows <button class="btn btn-primary" data-create-show>Create New Show</button>
+		<!--<span class="pull-right">-->
+	  		<button class="btn btn-primary" data-gimme-show-stats>Show Stats</button>
+      	<!--</span>-->
+  </h2>
+  <div class="modal fade" id="duplicateShowModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button id="copyTracksBtnX" type="button" class="close" aria-hidden="true" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Duplicate Show Name?</h4>
+        </div>
+        <div class="modal-body">
+          <input type="text" id="showName" name="showName" size="50"><br><br>
+		  <label for="copyTracksYes">Copy Tracks?</label>&nbsp;&nbsp;&nbsp;&nbsp;
+		  <input type="checkbox" id="copyTracks"><br><br>
+		  <button id="copyTracksBtnYes" type="submit" class="btn btn-primary">OK</button>
+		  <button id="copyTracksBtnCan" type="button" class="btn btn-default cancel" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="alertmodal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button id="alertBtnX" type="button" class="close" aria-hidden="true" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Alert</h4>
+        </div>
+        <div class="modal-body">
+          <p id="alerttxt"></p><br><br>
+		  <button id="alertBtnCan" type="button" class="btn btn-default cancel" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-success" data-duplicate-id="123">Duplicate</button>
+</template>
