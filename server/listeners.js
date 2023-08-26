@@ -1,20 +1,7 @@
 Meteor.startup(function() {
   Meteor.setInterval(function() {
-    var apiUrl = 'http://138.197.2.189:8000/status-json.xsl'
-    var response = HTTP.get(apiUrl).data
-    if (!response.icestats && !response.icestats.source) {
-      App.isRadioLogicDown = true
-      return
-    }
-    App.isRadioLogicDown = false
-    var numListeners =
-      response.icestats &&
-      response.icestats.source &&
-      response.icestats.source.listeners
-    //var res = Meteor.call("getCurrentTrack")
-    if (numListeners) {
-      ListenerStats.insert({ numListeners: numListeners })
-    }
+    //var response = HTTP.get(apiUrl).data
+	App.getListeners()
   }, 300000) //every 5 minutes
 })
 

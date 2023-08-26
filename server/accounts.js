@@ -1,10 +1,10 @@
-var imInonLogout = 0
+//var imInonLogout = 0
 Accounts.config({
   forbidClientAccountCreation: false,
   sendVerificationEmail: true,
-  loginExpirationInDays: 5,
+  loginExpirationInDays: 7,
 })
-Accounts.onLogout(function(obj){
+/*Accounts.onLogout(function(obj){
 	if (!Object.is(obj.user, null)){
 		var userId = obj.user._id
 		var sessions = _.filter(Meteor.default_server.sessions, function (session) {
@@ -24,4 +24,4 @@ Accounts.onLogout(function(obj){
 			imInonLogout = 0
 		}
 	}
-})
+})*/

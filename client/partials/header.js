@@ -1,7 +1,9 @@
 Template.HomeLayout.onCreated(function() {
   this.autorun(() => {
-    this.subscribe('new-messages-count-user')
+	Blaze._allowJavascriptUrls();
+	this.subscribe('new-messages-count-user')
 
+	/*
 	//*************************************************************************
 	//                 session disconnect/reconnect
 	//*************************************************************************
@@ -38,7 +40,7 @@ Template.HomeLayout.onCreated(function() {
 
 	document.addEventListener('visibilitychange', disconnectIfHidden)
 
-	Meteor.startup(disconnectIfHidden)
+	Meteor.startup(disconnectIfHidden)*/
 
 	//console.log(`${new Date().toLocaleTimeString('en-GB')} : ${Meteor.status().status}`);
 	//*************************************************************************
@@ -50,3 +52,14 @@ Template.HomeLayout.helpers({
     return Shows.findOne({ isActive: true })
   },
 })
+
+/*Template._loginButtonsLoggedInDropdown.events({
+    'click #login-buttons-logout': function (event) {
+    	event.preventDefault();
+		//var userId = Meteor.userId()
+    	Meteor.logout(function(err){
+        	//console.log('logging out ' + userId);
+        	FlowRouter.go('/');
+    	});
+	}
+})*/

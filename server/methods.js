@@ -54,6 +54,17 @@ Meteor.methods({
           },function(err, docInserted){if(err){if(err.code == 11000){}else{console.log(err);console.log(docInserted);}}}
 		  )
         })
+		if (!!trackLists){
+			var showId = docInserted
+			var indexNum = 0
+    		var trackLists = Tracklists.find(
+          		{ showId: showId },
+          		{ sort: { indexNumber: 1 } }
+        		).fetch()
+    		_.each(trackLists, function(trackList) {
+          		Tracklists.update({ _id: trackList._id}, { $set: { indexNumber: indexNum++} })
+        		})
+		}
       }
     )
   },
@@ -162,6 +173,29 @@ Meteor.methods({
       { $set: { isActive: false, isAutoPlaying: false, autoStartEnd: false } },
       { multi: true }
     )
+
+	//check tack order
+	try{
+		var indexNum = 0
+		var reNum = false
+		var trackLists = Tracklists.find(
+    		{ showId: showId },
+    		{ sort: { indexNumber: 1 } }
+    	).fetch()
+    	_.each(trackLists, function(trackList) {
+			if(('indexNumber' in trackList) && (trackList.indexNumber == indexNum)){indexNum++}else{reNum = true; return;}
+    	})
+		if (reNum){
+			indexNum = 0
+			_.each(trackLists, function(trackList) {
+				Tracklists.update({ _id: trackList._id}, { $set: { indexNumber: indexNum++} })
+			})
+		}
+	}
+	catch(err){
+		console.log(err)
+	}
+	
     Shows.update(
       { _id: showId },
       {

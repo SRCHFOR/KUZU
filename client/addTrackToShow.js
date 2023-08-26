@@ -8,7 +8,7 @@ Template.addTrackToShow.onCreated(function() {
 Template.addTrackToShow.helpers({
   mainShow() {
     if (Meteor.user() && Meteor.user().isAdmin) {
-      console.log('Imma admin')
+      //console.log('Imma admin')
       return Shows.findOne({ _id: FlowRouter.getParam('showId') })
     } else {
       return Shows.findOne({

@@ -1,7 +1,11 @@
+//as of Meteor 2.4 settings.json (Meteor.settings.packages.email) is used for email url instead of process.env.MAIL_URL
 //process.env.MAIL_URL="smtps://put@email.here:"+Meteor.settings.gmailAppWord+"@smtp.gmail.com:465/";
-process.env.MAIL_URL="smtps://kuzu929fm@gmail.com:"+Meteor.settings.gmailAppWord+"@smtp.gmail.com:465/";
+//process.env.MAIL_URL="smtps://kuzu929fm@gmail.com:"+Meteor.settings.gmailAppWord+"@smtp.gmail.com:465/";
+//as of Meteor 2.4 settings.json (Meteor.settings.packages.email) is used for email url instead of process.env.MAIL_URL
+
 //process.env.ROOT_URL="http://localhost:3000/"
 process.env.ROOT_URL="http://producer.kuzu.fm/"
+
 Accounts.emailTemplates.siteName = "KUZU Producer Verification";
 Accounts.emailTemplates.from = "KUZU Accounts <KUZU929FM@GMAIL.COM>";
 Accounts.emailTemplates.verifyEmail = {
@@ -12,6 +16,7 @@ Accounts.emailTemplates.verifyEmail = {
 		return `Hey ${user.emails[0].address}! Verify your e-mail by following this link: ${url}`;
 	}
 }
+
 console.log(process.env.NODE_ENV)
 
 Meteor.startup(function(){

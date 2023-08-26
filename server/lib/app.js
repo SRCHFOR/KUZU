@@ -43,3 +43,25 @@ App.sendAutoMsgs = function(msgShow, fromEmail, subjectLine, msgMsg){
       })
 	}
 }
+
+App.getListeners = async function(){
+    var apiUrl = 'http://138.197.2.189:8000/status-json.xsl'
+	fetch(apiUrl).then((reply) => {
+		reply.json().then((response) => {
+    		if (!response.icestats && !response.icestats.source) {
+      			App.isRadioLogicDown = true
+    		}
+			else{
+    			App.isRadioLogicDown = false
+    			var numListeners =
+      			response.icestats &&
+      			response.icestats.source &&
+      			response.icestats.source.listeners
+    			//var res = Meteor.call("getCurrentTrack")
+    			if (numListeners) {
+      				ListenerStats.insert({ numListeners: numListeners })
+    			}
+			}
+		}).catch((error) => {console.log(error);App.isRadioLogicDown = true;})
+	}).catch((error) => {console.log(error);App.isRadioLogicDown = true;})
+}
