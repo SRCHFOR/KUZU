@@ -53,13 +53,9 @@ Template.HomeLayout.helpers({
   },
 })
 
-/*Template._loginButtonsLoggedInDropdown.events({
+//Force refresh on logout because of infinite loop
+Template._loginButtonsLoggedInDropdown.events({
     'click #login-buttons-logout': function (event) {
-    	event.preventDefault();
-		//var userId = Meteor.userId()
-    	Meteor.logout(function(err){
-        	//console.log('logging out ' + userId);
-        	FlowRouter.go('/');
-    	});
+    	location.reload();
 	}
-})*/
+})
