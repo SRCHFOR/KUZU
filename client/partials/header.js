@@ -1,3 +1,4 @@
+var logoutReloadTimout = '';
 Template.HomeLayout.onCreated(function() {
   this.autorun(() => {
 	Blaze._allowJavascriptUrls();
@@ -56,6 +57,9 @@ Template.HomeLayout.helpers({
 //Force refresh on logout because of infinite loop
 Template._loginButtonsLoggedInDropdown.events({
     'click #login-buttons-logout': function (event) {
-    	location.reload();
+		Meteor.clearTimeout(logoutReloadTimout)
+		logoutReloadTimeout = Meteor.setTimeout(function() {
+    		location.reload();
+		},2000)
 	}
 })
