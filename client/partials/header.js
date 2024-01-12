@@ -1,10 +1,10 @@
-var logoutReloadTimout = '';
+var logoutReloadTimeout = '';
 Template.HomeLayout.onCreated(function() {
   this.autorun(() => {
 	Blaze._allowJavascriptUrls();
 	this.subscribe('new-messages-count-user')
 
-	/*
+	
 	//*************************************************************************
 	//                 session disconnect/reconnect
 	//*************************************************************************
@@ -41,7 +41,7 @@ Template.HomeLayout.onCreated(function() {
 
 	document.addEventListener('visibilitychange', disconnectIfHidden)
 
-	Meteor.startup(disconnectIfHidden)*/
+	Meteor.startup(disconnectIfHidden)
 
 	//console.log(`${new Date().toLocaleTimeString('en-GB')} : ${Meteor.status().status}`);
 	//*************************************************************************
@@ -57,9 +57,10 @@ Template.HomeLayout.helpers({
 //Force refresh on logout because of infinite loop
 Template._loginButtonsLoggedInDropdown.events({
     'click #login-buttons-logout': function (event) {
-		Meteor.clearTimeout(logoutReloadTimout)
+		Meteor.clearTimeout(logoutReloadTimeout)
 		logoutReloadTimeout = Meteor.setTimeout(function() {
-    		location.reload();
+			Meteor.clearTimeout(logoutReloadTimeout);
+			location.reload();
 		},2000)
 	}
 })

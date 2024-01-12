@@ -157,6 +157,9 @@ Template.showStats.onRendered(function() {
 				}
     		}
 		})
-	
+		
+		allUserTracks = ''
+		allUserShows = ''
+		returnAllUserTracks = [{}]
 	})
 })
