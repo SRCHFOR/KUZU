@@ -1,14 +1,62 @@
 //import momenttz from 'moment-timezone'
 Template.showStats.onCreated(function() {
-  this.autorun(() => {
+  Session.set('dataDL', false)
+  /*this.autorun(() => {
 	this.subscribe('producerShows')
 	this.subscribe('allUserTracks')
-  })
+  })*/
 })
 
 Template.showStats.onRendered(function() {
 	this.autorun(() => {
-		var returnAllUserTracks = [{}]
+		Meteor.call('getShowStatsData', Meteor.userId(), function(error, result){
+    										var colheaders = ['Artist', 'Song', 'Album', 'Label', 'Length', 'Type', 'Order', 'Date', 'Show']
+						
+											if (!!error){
+												alert("Error getting showStats")
+												
+												var result = ['Error', 'Error', 'Error', 'Error', 'Error', 'Error', 'Error', 'Error', 'Error']
+												$("#handsontable").handsontable({
+    												data: result,
+													columnSorting: true,
+    												colHeaders: true,
+													rowHeaders: true,
+    												contextMenu: true,
+  													manualColumnResize: true,
+													colHeaders: function(col){
+														if (col <= colheaders.length-1){
+															return colheaders[col]
+														}
+    												}
+												})
+												
+												console.log(error)
+												console.log(error.reason)
+											}
+											else{
+												Session.set('dataDL', result)
+												
+												$("#handsontable").handsontable({
+    												data: result,
+													columnSorting: true,
+    												colHeaders: true,
+													rowHeaders: true,
+    												contextMenu: true,
+  													manualColumnResize: true,
+													colHeaders: function(col){
+														if (col <= colheaders.length-1){
+															return colheaders[col]
+														}
+    												}
+												})
+											}
+		})
+		
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		//!!!!!!!!!!!!   Moved to getShowStatsData method in methods.js   !!!!!!!!!!!!!!!!
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		
+		/*
 		var allUserTracks = Tracklists.find(
       	{
         	userId: Meteor.userId() 
@@ -85,8 +133,10 @@ Template.showStats.onRendered(function() {
     		//return Handsontable.helper.createSpreadsheetData(100, 10);
   		}*/
 
+		/*
 		// Version 2
 		var data = function () {
+			var returnAllUserTracks = [{}]
 			var docNo3 = 0
 			if (allUserShows.length == 0 && allUserTracks.length == 1){}
 			else{
@@ -98,8 +148,8 @@ Template.showStats.onRendered(function() {
 							showName: allUserShows[docNo].showName
 						}
 						if (!!returnAllUserTracks[docNo3].playDate){
-							returnAllUserTracks[docNo3].playDate = new moment(new Date(returnAllUserTracks[docNo3].playDate)).format('MMMM Do YYYY, h:mm:ss a')
-							//returnAllUserTracks[docNo3].playDate = momenttz(new Date(returnAllUserTracks[docNo3].playDate)).tz('America/Chicago').format('MMMM Do YYYY, h:mm:ss a')
+							returnAllUserTracks[docNo3].playDate = new moment(new Date(returnAllUserTracks[docNo3].playDate)).format('MMMM Do YYYY h:mm:ss a')
+							//returnAllUserTracks[docNo3].playDate = momenttz(new Date(returnAllUserTracks[docNo3].playDate)).tz('America/Chicago').format('MMMM Do YYYY h:mm:ss a')
 						}
 						if (!!returnAllUserTracks[docNo3].showId){
 							delete returnAllUserTracks[docNo3].showId
@@ -157,9 +207,38 @@ Template.showStats.onRendered(function() {
 				}
     		}
 		})
-		
-		allUserTracks = ''
-		allUserShows = ''
-		returnAllUserTracks = [{}]
+		*/
 	})
+})
+
+Template.showStats.events({
+  'click #exportcsv': function() {
+	var data = Session.get('dataDL')
+	if (!!data){
+		//remove blank row
+		data.shift()
+		//add header row
+		//Field order record must be in the same order as the handsontable header
+		data.unshift(JSON.parse('{ "artist" : "artist",' +
+								'"songTitle" : "songTitle",' +
+								'"album" : "album",' +
+								'"label" : "label",' +
+								'"trackLength" : "trackLength",' +
+		//						'"showId" : "showId",' +
+								'"trackType" : "trackType",' +
+								'"indexNumber" : "order",' +
+								'"playDate" : "playDate",' +
+		//						'"_id" : "userid",' +
+								'"showName" : "showName"' +
+								'}'))
+    	var nameFile = moment().format() + '_showstats.csv'
+		var fileContent = () => {
+			return data.map(it => {
+    			return Object.values(it).toString()
+  			}).join('\n')
+		}
+    	var blob = new Blob([fileContent()], { type: 'text/plain;charset=utf-8' })
+        saveAs(blob, nameFile)
+	}
+   },
 })
