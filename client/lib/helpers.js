@@ -35,3 +35,11 @@ Template.registerHelper('prettifySimpleTime', date => {
   //var date = momenttz(new Date(date)).tz('America/Chicago').format('h:mm a')
   return date
 })
+Template.registerHelper('prettifySimpleTimeMsgs', date => {
+  if (!date) {
+    return ''
+  }
+  var date = new moment(date).format('MMM/D/YY, h:mm a')
+  //var date = momenttz(new Date(date)).tz('America/Chicago').format('MMM/D/YY, h:mm a')
+  return date
+})

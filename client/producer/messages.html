@@ -15,7 +15,7 @@
       {{#each messages}}
       <tr>
         <td>{{isRead}}</td>
-        <td>{{prettifySimpleTime sentAt}}</td>
+        <td>{{prettifySimpleTimeMsgs sentAt}}</td>
         <td>{{content}}</td>
         <th>{{sentBy}}</th>
         <th>{{#afModal formId="removeMessage" class="btn btn-warning" collection="Messages" operation="remove"
