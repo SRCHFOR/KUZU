@@ -15,14 +15,26 @@ Meteor.methods({
           if (!names[1]) {
             continue
           }
-          trackItem = {
-            artist: names[0],
-            songTitle: names[1],
-            album: item.Album,
-            label: item.Label,
-            trackLength: item.Length,
-            showId: currentShowId,
-          }
+		  if (!item.Type){
+          	trackItem = {
+            	artist: names[0],
+            	songTitle: names[1],
+            	album: item.Album,
+            	label: item.Label,
+            	trackLength: item.Length,
+            	showId: currentShowId,
+          	}
+		  } else{
+			trackItem = {
+            	artist: names[0],
+            	songTitle: names[1],
+            	album: item.Album,
+            	label: item.Label,
+            	trackLength: item.Length,
+            	showId: currentShowId,
+				trackType: item.Type,
+			}
+		  }
         } else {
           trackItem = {
             artist: ' ',
