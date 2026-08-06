@@ -45,7 +45,8 @@ App.sendAutoMsgs = function(msgShow, fromEmail, subjectLine, msgMsg){
 }
 
 App.getListeners = async function(){
-    var apiUrl = 'http://138.197.2.189:8000/status-json.xsl'
+    //old IP //var apiUrl = 'http://138.197.2.189:8000/status-json.xsl'
+	var apiUrl = 'http://209.97.146.139:8000/status-json.xsl'
 	fetch(apiUrl).then((reply) => {
 		reply.json().then((response) => {
     		if (!response.icestats && !response.icestats.source) {
