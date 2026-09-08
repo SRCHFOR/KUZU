@@ -1,6 +1,16 @@
+function fixIdLocal(badId){
+	return badId.match(/^[a-zA-Z0-9]{17}/)?.[0].trim()
+  }
+
+Template.editShowInline.helpers({
+  findThisShow(showId) {
+    return Shows.findOne({ _id: fixIdLocal(showId) })
+  },
+})
+
 Template.editShowInline.onCreated(function() {
   this.autorun(() => {
-    this.subscribe('singleShow', this.data._id)
+    this.subscribe('singleShow', fixIdLocal(this.data._id))
     this.subscribe('allUsersAdmin')
   })
 })

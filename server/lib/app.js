@@ -23,6 +23,7 @@ App.lastTrkReceivedTime = 'useShowStart'
 console.log(App.autoStartError)
 console.log(App.lastTrkAcknowledged)
 console.log(App.lastTrkReceivedTime)
+console.log(Meteor.release)
 
 App.sendAutoMsgs = function(msgShow, fromEmail, subjectLine, msgMsg){
 	var user = Meteor.users.findOne({ _id: msgShow.userId })

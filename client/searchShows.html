@@ -1,0 +1,58 @@
+<template name="searchShows">
+  <div class="modal fade" id="duplicateShowModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button id="copyTracksBtnX" type="button" class="close" aria-hidden="true" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Duplicate Show Name?</h4>
+        </div>
+        <div class="modal-body">
+          <input type="text" id="showName" name="showName" size="50"><br><br>
+		  <label for="copyTracksYes">Copy Tracks?</label>&nbsp;&nbsp;&nbsp;&nbsp;
+		  <input type="checkbox" id="copyTracks"><br><br>
+		  <button id="copyTracksBtnYes" type="submit" class="btn btn-primary">OK</button>
+		  <button id="copyTracksBtnCan" type="button" class="btn btn-default cancel" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="alertmodal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button id="alertBtnX" type="button" class="close" aria-hidden="true" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Alert</h4>
+        </div>
+        <div class="modal-body">
+          <p id="alerttxt"></p><br><br>
+		  <button id="alertBtnCan" type="button" class="btn btn-default cancel" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr>
+  <div class="form-holder">
+   	<h4>Search Shows {{> EasySearch.Input index=producerShowsIndex}}</h4>
+  </div>
+  {{#EasySearch.Each index=producerShowsIndex}}
+  <div>
+    {{#unless $eq ($.Session.get "showEditingId") (fixId _id)}}
+    <h3>{{prettifyDate showStart}} - {{showName}}<br><span class="small">{{prettifySimpleTime showStart}} -
+        {{prettifySimpleTime showEnd}}</span></h3>
+    <h3>{{#unless isActive}}<a href="{{pathFor 'showTracks' showId=(fixId _id)}}">
+        <!--{{numTracks}} -->Tracks</a>{{/unless}} {{#if defaultMeta}}<small>{{defaultMeta}}</small>{{/if}}</h3>
+	{{showDuplicateModal}}
+    <button class="btn btn-success" data-duplicate-id="{{_id}}">Duplicate</button>
+    <button class="btn btn-info" data-edit-show-id="{{_id}}">Edit</button>
+    {{else}}
+    {{> editShowInline}}
+    {{/unless}}
+    <hr>
+  </div>
+  {{/EasySearch.Each}}
+  <!--{{> EasySearch.LoadMore index=producerShowsIndex}}-->
+  <!-- stock easy button seems busted so create my own -->
+  {{#unless isLoadMoreDisabled}}
+  	<button class="btn btn-primary" trigger-next-wdate-set >Load More Shows</button>
+  {{/unless}}
+</template>

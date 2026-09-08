@@ -19,8 +19,13 @@ console.log(process.env.NODE_ENV)
 
 Meteor.startup(function(){
 	Meteor.absoluteUrl.defaultOptions.secure = false
-	Meteor.absoluteUrl.defaultOptions.rootUrl = process.env.ROOT_URL	
+	Meteor.absoluteUrl.defaultOptions.rootUrl = process.env.ROOT_URL
 	
+	//Pre-sort Tracklists and Shows for the showStats download
+	Tracklists.rawCollection().createIndex({ userId: 1, indexNumber: 1, _id: 1 });
+  	Shows.rawCollection().createIndex({ showName: 1, _id: 1 });	
+	
+	//Send reminder emails
 	Meteor.setInterval(function() {
 		Shows.find({ showStart: { $exists: true, $gte : new Date((new Date().toISOString())) } }).forEach(function(show){
 														Meteor.users.find({"producerProfile.showStartReminderSubs": {$elemMatch: {$eq: show.userId}}}).forEach(function(subscriber){
@@ -41,6 +46,60 @@ Meteor.startup(function(){
 														})
 													})
   	}, 60000) //every minute
+
+	//Register URI traffic cop
+	const trafficCop = (req, res, next) => {
+    	try {
+			//Test if the URL is valid.
+      		decodeURI(req.url);
+      		next();
+    	} 
+		catch (error) {
+      		if (error instanceof URIError) {
+				//extract IP and url from request
+        		const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+        		console.warn(`[Bad Request Blocked] Malformed URI from IP: ${ip} - Path: ${req.url}`);
+        
+        		//Reject the request and close the connection
+        		res.writeHead(400, { 'Content-Type': 'text/plain' });
+        		res.end('Bad Request: Malformed URI');
+      		} 
+			else {
+				//Don't print unknown error on client
+				console.error(error)
+        		res.writeHead(500, { 'Content-Type': 'text/plain' });
+        		res.end('Internal Server Error');
+      		}
+    	}
+	}
+	//Move trafficCop handler to top of routes
+	WebApp.connectHandlers.stack.unshift({
+    	route: '', //All URLs
+    	handle: trafficCop
+  	})
+
+	//counts for fun
+	Meteor.call('getAllUserCounts', function(error, result){
+									if (!!error){
+										console.log("error on getAllUserShows from init startup")
+										console.log(error)
+										console.log(error.reason)
+									}
+									else{
+										console.log('')
+										console.log('******************************************')
+										console.log('************ Counts Begin ****************')
+										console.log('******************************************')
+										console.log('Username|ProfileName|ProducerName|ShowName|ShowTotal|TrackTotal')
+										_.each(result, function(result) {
+											console.log(result.users.username + '|' + result.users.profile?.name + '|' + result.users.producerProfile.name + '|' + result.users.producerProfile.showName + '|' + result.totalShows + '|' + result.totalTracks)
+    									})
+										console.log('******************************************')
+										console.log('************ Counts End ******************')
+										console.log('******************************************')
+										console.log('')
+									}
+								})
 
 //     var users = Meteor.users.find().fetch();
 //     _.each(users,function(userData){

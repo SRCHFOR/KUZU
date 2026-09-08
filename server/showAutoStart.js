@@ -27,13 +27,13 @@ App.addAutoStartShow = function(showId) {
 				console.log(result)
 			}
 			
-			subject = 'AutoStart yet to begin; Manual Start Required.'
-			message = "It's 5 mins past show start, and your Show's AutoStart has yet to begin. Now Autostarting using Show Start time."
-			App.sendAutoMsgs(show, Accounts.emailTemplates.from, subject, message)
         	//Shows.update(
           	//	{ isArmedForAutoStart: true },
 			//	{ $set: { isArmedForAutoStart: false, autoStartEnd: false, isAutoPlaying: false, autoPlayPressed: false, startPressed: false } }
         	//)
+			subject = 'AutoStart yet to begin; Manual Start Required.'
+			message = "It's 5 mins past show start, and your Show's AutoStart has yet to begin. Now Autostarting using Show Start time."
+			App.sendAutoMsgs(show, Accounts.emailTemplates.from, subject, message)
 		}
 	  },(new moment(new Date(show.showStart)).add(5, 'minutes').valueOf())-(new Date().getTime()))
   }

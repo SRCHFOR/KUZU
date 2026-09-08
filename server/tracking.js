@@ -86,9 +86,9 @@ Meteor.method(
 		}
 		App.lastTrkAcknowledged = false
 		var currMin = new moment(new Date()).minute()
-		//console.log('hi3')
-		//first if statement for testing at any time
-		//if ((currMin >= "50" && currMin <= "54") || (currMin >= "55" && currMin <= "59")){
+		//This is so that autostart shows only start within 5 mins of either side of the top of the hour
+		//Use the first if statement for testing at any time and comment out the 'prod'/second if statement
+		//if ((currMin >= "40" && currMin <= "54") || (currMin >= "55" && currMin <= "59")){
 		if ((currMin >= "55" && currMin <= "59") || (currMin >= "00" && currMin <= "05")){
 			App.lastTrkReceivedTime = ''
 			//console.log('hi1')

@@ -3,6 +3,9 @@ var checkAutoStartError = new ReactiveVar(false);
 var checkArmedShow = new ReactiveVar(false);
 var autoErrorCheckInterval = '';
 var armedShowId = '';
+var clickCounter = new ReactiveVar(0);
+
+//Prime assumption for shows across the app is that there is only ever one show that is to be or ready to be started at any one time
 
 Template.producerShows.helpers({
   hasFullUI() {
@@ -43,6 +46,12 @@ Template.producerShows.helpers({
       	$or: [{ userId: Meteor.userId() }, { helperUserId: Meteor.userId() }]
       }]
     })
+  },
+  ifSingleActiveShow() {
+	return !!Shows.findOne({ $and: [{isActive: true}, { $or: [{ userId: this.userId }, { helperUserId: this.userId }]}]})
+  },
+  singleActiveShow() {
+    return Shows.find({ $and: [{isActive: true}, { $or: [{ userId: this.userId }, { helperUserId: this.userId }]}]})
   },
   updateShowFormId() {
     return 'updateShow' + this._id
@@ -103,11 +112,19 @@ Template.producerShows.helpers({
    		})
 	})
   },
-  isTenMinutesPriorToShowTime(showId) {
+  isTenMinutesPriorToShowTime(show) {
+	//console.log('4' + show.showName)
+	var showId = show._id
 	var thisShow = Shows.findOne({_id: showId})
 	showsDateSwitch.set(thisShow.tenMinutesPriorToShowTime())
 	if (!showsDateSwitch.get()){
-      var dateSwitchIntervale = Meteor.setInterval(function(){if (!showsDateSwitch.get()){showsDateSwitch.set(thisShow.tenMinutesPriorToShowTime())}else{Meteor.clearInterval(dateSwitchIntervale)}}, 1000)
+	  //Skip setting timers during the initial simulation pass
+	  if (DDP._CurrentInvocation?.get()?.isSimulation){
+  	  	clickCounter.set(clickCounter.get() + 1)
+	  }
+	  else {
+        var dateSwitchIntervale = Meteor.setInterval(function(){if (!showsDateSwitch.get()){showsDateSwitch.set(thisShow.tenMinutesPriorToShowTime())}else{Meteor.clearInterval(dateSwitchIntervale)}}, 1000)
+	  }
     }
     return showsDateSwitch.get()
   },
@@ -141,7 +158,7 @@ Template.producerShows.helpers({
 		armedShowId = Shows.findOne({ isArmedForAutoStart: true })._id
 	}
 	else {
-		if (!!Shows.findOne({ _id: armedShowId, isActive: true, $or: [{ userId: Meteor.userId() }, { helperUserId: Meteor.userId() }]})){
+		if (!!Shows.findOne({ $and: [{ _id: armedShowId, isActive: true }, { $or: [{ userId: Meteor.userId() }, { helperUserId: Meteor.userId() }]}]})){
 			FlowRouter.go('liveShow')
 		}
 	}
@@ -150,7 +167,7 @@ Template.producerShows.helpers({
 
 Template.producerShows.onCreated(function() {
   this.autorun(() => {
-    this.subscribe('producerShows')
+    this.subscribe('producerShows', clickCounter.get())
     this.subscribe('allUsersAdmin')
   })
 })
@@ -159,6 +176,7 @@ Template.producerShows.events({
   'click [data-deactivate-show-id]'(e, t) {
     var showId = $(e.currentTarget).attr('data-deactivate-show-id')
     Meteor.call('deactivateShow', showId)
+	clickCounter.set(clickCounter.get() + 1)
 	//Client must be refreshed when a show is deactivated
 	location.reload()
   },
@@ -191,7 +209,9 @@ Template.producerShows.events({
   'click [data-delete-id]'(e, t) {
     if (confirm('Are You sure want to delete this?')) {
       var showId = $(e.currentTarget).attr('data-delete-id')
+	  Meteor.call('removeAutoStartShow', showId)
       Meteor.call('removeShow', showId)
+	  clickCounter.set(clickCounter.get() + 1)
     }
   },
   'click [data-duplicate-id]'(e, t) {
@@ -214,6 +234,9 @@ Template.producerShows.events({
 		//console.log(showName)
 		//console.log(weOK)
 		
+		//escape any backslashes
+		showName = showName.replace(/\\/g, '\\\\')
+		
 		showObject = JSON.parse('{ "showName" : "' +
 								showName + 
 								'", "copyTracks": ' +
@@ -225,6 +248,7 @@ Template.producerShows.events({
 		if (weOK && showObject && showId) {
 			if (showObject.showName){
      			Meteor.call('duplicateShow', showId, showObject)
+				clickCounter.set(clickCounter.get() + 1)
 			}
 			else{
 				alert('A Show Name must be entered to duplicate.')
@@ -261,12 +285,18 @@ Template.producerShows.events({
   },
   'click [data-create-show]'() {
     Meteor.call('createNewShow')
+    clickCounter.set(clickCounter.get() + 1)
   },
   'click [data-edit-show-id]'(e, t) {
     var showId = $(e.currentTarget).attr('data-edit-show-id')
     Session.set('showEditingId', showId)
+	clickCounter.set(clickCounter.get() + 1)
   },
   'click [data-gimme-show-stats]'(e, t) {
     FlowRouter.go('showStats')
+  },
+  'click [data-search-me-daddy]'(e, t) {
+    FlowRouter.go('searchShows')
+	location.reload()
   },
 })

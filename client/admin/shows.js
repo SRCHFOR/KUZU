@@ -3,9 +3,6 @@ Template.adminShows.helpers({
   showsIndex() {
     return ShowsIndex
   },
-})
-
-Template.adminShows.helpers({
   endTimeAfterCurrentDate() {
 	var showEnd = moment(new Date(this.showEnd))
     //var showEnd = new moment(momenttz(new Date(this.showEnd)).tz('America/Chicago'))
@@ -76,5 +73,8 @@ Template.adminShows.events({
 										}
 									}
 								})
+  },
+  'click [trigger-next-show-set]'(e, t) {
+    ShowsIndex.getComponentMethods().loadMore(ShowsIndex.defaultSearchOptions.limit)
   },
 })

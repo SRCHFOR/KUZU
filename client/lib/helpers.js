@@ -43,3 +43,6 @@ Template.registerHelper('prettifySimpleTimeMsgs', date => {
   //var date = momenttz(new Date(date)).tz('America/Chicago').format('MMM/D/YY, h:mm a')
   return date
 })
+Template.registerHelper('fixId', function(badId) {
+    return badId.match(/^[a-zA-Z0-9]{17}/)?.[0].trim()
+})

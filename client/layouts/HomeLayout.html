@@ -13,19 +13,23 @@
   </div>
   {{/if}}
   {{#unless $eq currentRouteName "liveShow"}}
-  {{#with currentActiveShow}}
+  {{#with currentActiveShow}} <!--comment this with line out if ever switch to displaying autodj tracks-->
   <div style="background-color:#e7d0ba;margin-top:-21px;padding:15px 5px;">
     <a style="text-align:center;" href="{{#if currentUser.canLookAtLiveShow}}{{pathFor 'liveShow'}}{{/if}}">
       <div class="container">
+		<!--{{#with currentActiveShow}}-->
         <h3 style="color:rgb(129, 129, 129);margin-top:10px;"><span style="color:rgb(0, 0, 0);margin-top:10px;">{{showName}}</span> is Live from <span style="color:rgb(0, 0, 0);margin-top:10px;">{{prettifySimpleTime showStart}} -
           {{prettifySimpleTime showEnd}}</span>!</h3>
+		<!--{{else}}
+		<h3 style="color:rgb(129, 129, 129);margin-top:10px;"><span style="color:rgb(0, 0, 0);margin-top:10px;">AutoDJ</span></h3>
+		{{/with}}-->
         <h3 style="color:rgb(129, 129, 129);margin-top:10px;">Playing <span style="color:rgb(0, 0, 0);margin-top:10px;">{{currentPlayingSong}}</span> by <span style="color:rgb(0, 0, 0);margin-top:10px;">{{currentPlayingArtist}}</span></h3>
       </div>
     </a>
   </div>
   {{else}}
   {{cancelSongArtistTimers}}
-  {{/with}}
+  {{/with}}<!--comment this with line out if ever switch to displaying autodj tracks-->
   {{/unless}}
   <div id="siteWrapper" class="clearfix">
   </div>
@@ -33,4 +37,10 @@
 
   {{> Footer}}
   {{/if}}
+</template>
+
+<template name="PageNotFound">
+  <div id="siteWrapper" class="clearfix">
+    <h1>404: Page Not Found</h1>
+  </div>
 </template>

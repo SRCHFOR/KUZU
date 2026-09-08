@@ -252,9 +252,25 @@ Meteor.methods({
 	return centralTime.format('l') + ', ' + centralTime.format('LTS')
 	//return new moment(new Date()).valueOf()
   },
-  getAllUserShows(){
+  getAllUsers(){
 	var users = Meteor.users.find().fetch()
 	return users
+  },
+  getAllUserCounts(){
+	var returnVar = []
+	var users = Meteor.users.find().fetch()
+	_.each(users, function(user) {
+		var helperShowIds = Shows.find({helperUserId: user._id},{fields: {_id : 1}}).map(doc => doc._id)
+		var totalShows = Shows.find({$or: [{userId: user._id},{helperUserId: user._id }]}).count()
+		var totalTracks = Tracklists.find({
+			$or: [
+        		{userId: user._id},
+				{showId: { $in: helperShowIds }}
+			]
+		}).count()
+		returnVar.push({users: user, totalShows: totalShows, totalTracks: totalTracks})
+	})
+	return returnVar
   },
   autoStartArmedShow(armedShow){
 		var subject = ''
@@ -268,14 +284,14 @@ Meteor.methods({
 				console.log('Bad result variable on autoplayNextTrack in methods.js call')
 				console.log(result)
 				console.log(armedShow)
-				App.autoStartError = true
-				subject = 'AutoStart Error; Manual Start Required.'
-				message = 'There has been an AutoStart error on your show. Manual Show Start Required.'
-				App.sendAutoMsgs(armedShow, Accounts.emailTemplates.from, subject, message)
         		Shows.update(
           			{ isArmedForAutoStart: true },
 					{ $set: { isArmedForAutoStart: false, autoStartEnd: false, isAutoPlaying: false, autoPlayPressed: false, startPressed: false } }
         		)
+				App.autoStartError = true
+				subject = 'AutoStart Error; Manual Start Required.'
+				message = 'There has been an AutoStart error on your show. Manual Show Start Required.'
+				App.sendAutoMsgs(armedShow, Accounts.emailTemplates.from, subject, message)
 			}
 			else{
 				App.autoStartError = false
@@ -295,32 +311,47 @@ Meteor.methods({
     		console.log(error);
 			console.log('Error on autoplayNextTrack in tracking.js')
 			console.log(armedShow)
+			Shows.update(
+          		{ isArmedForAutoStart: true },
+				{ $set: { isArmedForAutoStart: false, autoStartEnd: false, isAutoPlaying: false, autoPlayPressed: false, startPressed: false } }
+        	)
 			App.autoStartError = true
 			subject = 'AutoStart Error; Manual Start Required.'
 			message = 'There has been an AutoStart error on your show. Manual Show Start Required.'
 			App.sendAutoMsgs(armedShow, Accounts.emailTemplates.from, subject, message)
-        	Shows.update(
-          		{ isArmedForAutoStart: true },
-				{ $set: { isArmedForAutoStart: false, autoStartEnd: false, isAutoPlaying: false, autoPlayPressed: false, startPressed: false } }
-        	)
 		}
   },
-  getShowStatsData(userIdent){
+  getShowStatsData(userIdent, page, limit){
+		var skip = (page - 1) * limit
+		
+		var helperShowIds = Shows.find({helperUserId: userIdent},{fields: {_id : 1}}).map(doc => doc._id)
+		
+		var totalShows = Shows.find({$or: [{userId: userIdent},{helperUserId: userIdent }]}).count()
+		
+		var totalTracks = Tracklists.find({
+			$or: [
+        		{userId: userIdent},
+				{showId: { $in: helperShowIds }}
+			]
+		}).count()
+		
 		var allUserTracks = Tracklists.find(
       	{
-        	userId: userIdent 
+			$or: [
+        		{userId: userIdent},
+				{showId: { $in: helperShowIds }}
+			]
+			//userId: userIdent
       	},
 		{ 
-			fields: { isHighlighted: 0, userId: 0 } 
-		},
-      	{ 
-			sort: { indexNumber: 1 } 
-		},
-		{
-			
+			fields: { isHighlighted: 0, userId: 0 }, 
+    		sort: { indexNumber: 1 },
+    		skip: skip,
+    		limit: limit
 		}
     	).fetch()
 		
+		/* Moved data processing back to client side because of pagination 
 		//Field order record so that any undefined properties don't shorten the output record in the handsontable table
 		//Field order record must be in the same order as the handsontable header
 		allUserTracks.unshift(JSON.parse('{ "artist" : "",' +
@@ -339,16 +370,32 @@ Meteor.methods({
 		//delete allUserTracks[0]._id
 		//console.log(allUserTracks)
 		//console.log('hi')
+		*/
 		
 		var allUserShows = Shows.find(
 		{
-			userId: userIdent
+			$or: [
+        		{userId: userIdent},
+				{helperUserId: userIdent }
+			]
+			//userId: userIdent
 		}, 
 		{
-			fields: {showName : 1}
+			fields: {showName : 1}, 
+    		sort: {showName: 1, _id: 1},
+			skip: skip,
+        	limit: limit 
 		}
 		).fetch()
+		
+		var returnVar = {allUserTracks: allUserTracks,
+      		allUserShows: allUserShows,
+      		totalTracks: totalTracks,
+			totalShows: totalShows}
+		//console.log(returnVar)
+		return returnVar
 	
+		/* Moved data processing back to client side because of pagination 
 		var data = function () {
 			var returnAllUserTracks = [{}]
 			var docNo3 = 0
@@ -435,6 +482,7 @@ Meteor.methods({
   		}
 
 		return data();
+		*/
   }
 })
 
