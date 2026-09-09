@@ -47,9 +47,6 @@ Template.producerShows.helpers({
       }]
     })
   },
-  ifSingleActiveShow() {
-	return !!Shows.findOne({ $and: [{isActive: true}, { $or: [{ userId: this.userId }, { helperUserId: this.userId }]}]})
-  },
   singleActiveShow() {
     return Shows.find({ $and: [{isActive: true}, { $or: [{ userId: this.userId }, { helperUserId: this.userId }]}]})
   },

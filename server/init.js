@@ -17,13 +17,36 @@ Accounts.emailTemplates.verifyEmail = {
 
 console.log(process.env.NODE_ENV)
 
+//Function to suppress certain errors
+const originalMeteorDebug = Meteor._debug;
+
+Meteor._debug = function (message, stack) {
+  const errString = String(message) + String(stack);
+  
+  //Checks to suppress errors
+  if (
+    errString.includes("Cannot access 'resultsHandle' before initialization")
+	||
+    errString.includes("easysearch:core/lib/core/search-collection.js")
+	//||
+	//errString.includes("new error here")
+  ) {
+    //return nothing to suppress error
+	//console.log('stopped ya' + ' ' + message)
+    return
+  }
+
+  originalMeteorDebug.apply(this, arguments)
+}
+//END - Function to suppress certain errors - END
+
 Meteor.startup(function(){
 	Meteor.absoluteUrl.defaultOptions.secure = false
 	Meteor.absoluteUrl.defaultOptions.rootUrl = process.env.ROOT_URL
 	
-	//Pre-sort Tracklists and Shows for the showStats download
-	Tracklists.rawCollection().createIndex({ userId: 1, indexNumber: 1, _id: 1 });
-  	Shows.rawCollection().createIndex({ showName: 1, _id: 1 });	
+	//Pre-sort Tracklists and Shows for the showStats download and show history search
+	Tracklists.rawCollection().createIndex({ userId: 1, indexNumber: 1, _id: 1 })
+  	Shows.rawCollection().createIndex({ userId: 1, helperUserId: 1, showName: 1, _id: 1 })
 	
 	//Send reminder emails
 	Meteor.setInterval(function() {
@@ -92,7 +115,7 @@ Meteor.startup(function(){
 										console.log('******************************************')
 										console.log('Username|ProfileName|ProducerName|ShowName|ShowTotal|TrackTotal')
 										_.each(result, function(result) {
-											console.log(result.users.username + '|' + result.users.profile?.name + '|' + result.users.producerProfile.name + '|' + result.users.producerProfile.showName + '|' + result.totalShows + '|' + result.totalTracks)
+											console.log( (result.users?.username?.trim().replace(/\|/g, ',') || 'undefined') + '|' + (result.users?.profile?.name?.trim().replace(/\|/g, ',') || 'undefined') + '|' + (result.users?.producerProfile?.name?.trim().replace(/\|/g, ',') || 'undefined') + '|' + (result.users?.producerProfile?.showName?.trim().replace(/\|/g, ',') || 'undefined') + '|' + result.totalShows + '|' + result.totalTracks )
     									})
 										console.log('******************************************')
 										console.log('************ Counts End ******************')

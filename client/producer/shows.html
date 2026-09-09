@@ -37,7 +37,6 @@
     </div>
   </div>
   <hr>
-  {{#unless ifSingleActiveShow}}
   {{#each showsWithoutDates}}
   <div>
     {{#unless $eq ($.Session.get "showEditingId") _id}}
@@ -57,7 +56,6 @@
     <hr>
   </div>
   {{/each}}
-  {{/unless}}
   {{#each showsWithDates}}
   {{#if isActive}}
   <a href="{{pathFor 'liveShow'}}">
